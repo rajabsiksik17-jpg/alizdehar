@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   Al-Izdehar Logistics — Global Design System
+   All tokens are centralized here (and overridable from the CMS
+   design-token layer) so colors/fonts/radius stay consistent.
+   ───────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Brand — deep ocean navy */
+  --color-brand-50: #f2f6fb;
+  --color-brand-100: #e2ecf6;
+  --color-brand-200: #c3d7ec;
+  --color-brand-300: #92b7dc;
+  --color-brand-400: #5a92c7;
+  --color-brand-500: #3574b0;
+  --color-brand-600: #255c94;
+  --color-brand-700: #1e4a78;
+  --color-brand-800: #173b61;
+  --color-brand-900: #0f2a48;
+  --color-brand-950: #081c33;
+
+  /* Accent — refined gold (sparingly: CTA highlights, badges) */
+  --color-accent-50: #fdf7ec;
+  --color-accent-100: #f9ecd0;
+  --color-accent-200: #f2d79e;
+  --color-accent-300: #e9bd63;
+  --color-accent-400: #e2a53a;
+  --color-accent-500: #d98c1f;
+  --color-accent-600: #bd7016;
+  --color-accent-700: #9a5415;
+  --color-accent-800: #7e4317;
+  --color-accent-900: #683816;
+
+  /* Surfaces & text */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f7fa;
+  --color-ink: #0b1d33;
+  --color-ink-muted: #55647a;
+
+  /* Fonts (variables set in next/font) */
+  --font-sans: var(--font-inter), var(--font-cairo), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-heading: var(--font-inter), var(--font-cairo), ui-sans-serif,
+    system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), var(--font-inter), ui-sans-serif,
+    system-ui, sans-serif;
+
+  /* Radius */
+  --radius-4xl: 2rem;
+
+  /* Container width */
+  --container-content: 76rem;
+
+  /* Shadows */
+  --shadow-soft: 0 1px 2px rgb(15 42 72 / 0.04), 0 8px 24px rgb(15 42 72 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(15 42 72 / 0.06), 0 20px 40px rgb(15 42 72 / 0.12);
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Animations */
+  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) both;
+  --animate-fade-in: fade-in 0.9s ease both;
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-dash: dash 2.4s linear infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Arabic typography */
+[dir="rtl"] body,
+[dir="rtl"] {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-family: var(--font-arabic);
+  line-height: 1.35;
+}
+
+::selection {
+  background: var(--color-accent-200);
+  color: var(--color-brand-950);
+}
+
+/* ── Focus visibility (accessibility) ─────────────────────── */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Scroll-reveal helper (JS adds `.is-visible`) ─────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s var(--ease-out-soft),
+    transform 0.7s var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
