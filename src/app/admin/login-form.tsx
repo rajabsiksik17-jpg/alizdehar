@@ -11,7 +11,9 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const configured = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const configured = !!(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,8 +32,12 @@ export function LoginForm() {
         router.push("/admin");
         router.refresh();
       }
-    } catch {
-      setError("Unable to sign in. Is Supabase configured correctly?");
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Unable to sign in. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
