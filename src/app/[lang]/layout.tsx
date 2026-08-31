@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, dir, locales } from "@/lib/i18n/config";
 import { cairo } from "@/lib/fonts";
+import "../globals.css";
 import { getSettings, getMenu, getServices } from "@/lib/content";
 import { getAdminUser } from "@/lib/admin-auth";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
