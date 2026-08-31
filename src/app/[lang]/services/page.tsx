@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
 import { getServices } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
+import { resolvePageBackground } from "@/lib/page-background";
 import { Section } from "@/components/sections";
+import { PageHero } from "@/components/page-hero";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { MediaImage } from "@/components/media-image";
 import { Reveal } from "@/components/reveal";
@@ -35,36 +37,21 @@ export default async function ServicesPage({ params }: PageProps<"/[lang]/servic
 
   const services = await getServices();
   const dict = getDictionary(lang);
+  const background = await resolvePageBackground("services");
 
   return (
     <>
-      <section className="relative overflow-hidden bg-brand-950 pt-36 pb-16 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.07]" aria-hidden="true">
-          <svg className="h-full w-full" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
-            <g fill="none" stroke="#fff" strokeWidth="1">
-              <circle cx="600" cy="200" r="180" />
-              <circle cx="600" cy="200" r="100" />
-              <path d="M0 200H1200M600 0V400" />
-            </g>
-          </svg>
-        </div>
-        <div className="relative mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
-          <Reveal className="max-w-3xl">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {dict.nav.services}
-            </h1>
-            <p className="mt-5 text-lg leading-relaxed text-white/70">
-              {pick(
-                {
-                  en: "Integrated shipping and logistics solutions that connect your business to global markets.",
-                  ar: "حلول شحن ولوجستيات متكاملة تربط أعمالك بالأسواق العالمية.",
-                },
-                lang,
-              )}
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <PageHero
+        title={dict.nav.services}
+        subtitle={pick(
+          {
+            en: "Integrated shipping and logistics solutions that connect your business to global markets.",
+            ar: "حلول شحن ولوجستيات متكاملة تربط أعمالك بالأسواق العالمية.",
+          },
+          lang,
+        )}
+        background={background}
+      />
 
       <Breadcrumbs locale={lang} items={[{ name: dict.nav.services }]} />
 

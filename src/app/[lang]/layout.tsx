@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Inter, Cairo } from "next/font/google";
 import { isLocale, dir, locales } from "@/lib/i18n/config";
+import { cairo } from "@/lib/fonts";
 import { getSettings, getMenu, getServices } from "@/lib/content";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -9,18 +9,6 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SocialFloat } from "@/components/layout/social-float";
 import { CookieConsent } from "@/components/layout/cookie-consent";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  variable: "--font-cairo",
-  display: "swap",
-});
 
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -68,7 +56,7 @@ export default async function LangLayout({
   ]);
 
   return (
-    <html lang={lang} dir={dir(lang)} className={`${inter.variable} ${cairo.variable} h-full antialiased`}>
+    <html lang={lang} dir={dir(lang)} className={`${cairo.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <JsonLd data={organizationJsonLd(settings)} />
         <JsonLd data={websiteJsonLd(settings)} />

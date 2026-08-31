@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import type { LocalizedText } from "@/lib/i18n/config";
 import type {
   BlogPost,
   Career,
@@ -24,6 +25,7 @@ import {
   seedBlogPosts,
   seedCareers,
   seedGallery,
+  seedCargoTypes,
 } from "@/content/misc";
 
 function createReadonlyClient() {
@@ -121,14 +123,20 @@ const seedPages: Record<string, Page> = {
 
 export async function getPage(slug: string): Promise<Page | null> {
   const row = await fromSupabase(async (c) => {
-    const { data, error } = await c
+    const { data: page, error } = await c
       .from("pages")
       .select("*")
       .eq("slug", slug)
       .eq("status", "published")
       .maybeSingle();
-    if (error || !data) return null;
-    return data as Page;
+    if (error || !page) return null;
+    const { data: sections } = await c
+      .from("page_sections")
+      .select("*")
+      .eq("page_id", page.id)
+      .eq("hidden", false)
+      .order("sort_order");
+    return { ...page, sections: (sections ?? []) as Page["sections"] } as Page;
   });
   return row ?? seedPages[slug] ?? null;
 }
@@ -250,4 +258,37 @@ export async function getCareers(): Promise<Career[]> {
     return data as Career[];
   });
   return rows ?? seedCareers;
+}
+
+export async function getCareerBySlug(slug: string): Promise<Career | null> {
+  const row = await fromSupabase(async (c) => {
+    const { data, error } = await c
+      .from("careers")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+    if (error || !data) return null;
+    return data as Career;
+  });
+  return row ?? seedCareers.find((j) => j.slug === slug) ?? null;
+}
+
+export async function getCareerSlugs(): Promise<string[]> {
+  const careers = await getCareers();
+  return careers.map((j) => j.slug);
+}
+
+/* ── Cargo types ──────────────────────────────────────────── */
+
+export async function getCargoTypes(): Promise<LocalizedText[]> {
+  const rows = await fromSupabase(async (c) => {
+    const { data, error } = await c
+      .from("cargo_types")
+      .select("label")
+      .order("sort_order");
+    if (error || !data?.length) return null;
+    return data.map((r: { label: LocalizedText }) => r.label) as LocalizedText[];
+  });
+  return rows ?? seedCargoTypes;
 }

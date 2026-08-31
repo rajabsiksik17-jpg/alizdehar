@@ -128,8 +128,11 @@ export function SectionRenderer({
       return <TrustBar section={section} locale={locale} />;
     case "services_grid":
       return <ServicesGrid section={section} locale={locale} services={data.services} />;
-    case "features":
-      return <Features section={section} locale={locale} items={data.whyUs} />;
+    case "features": {
+      const sectionItems = (section.items as unknown as WhyUsItem[]) || [];
+      const items = sectionItems.length ? sectionItems : data.whyUs;
+      return <Features section={section} locale={locale} items={items} />;
+    }
     case "process":
       return <Process section={section} locale={locale} />;
     case "image_text":

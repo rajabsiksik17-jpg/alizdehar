@@ -58,13 +58,13 @@ export function Header({
           {menu.map((item) =>
             item.children.length ? (
               <div key={item.id} className="group relative">
-                <button
-                  type="button"
+                <Link
+                  href={href(locale, item.url || "/")}
                   className={cn("flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors", linkColor)}
                 >
                   {pick(item.label, locale)}
                   <Icon name="chevron-down" className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
-                </button>
+                </Link>
                 <div className="invisible absolute start-0 top-full pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
                   <ul className="w-72 overflow-hidden rounded-xl border border-brand-100 bg-white p-2 shadow-lift">
                     {item.children.map((child) => (
@@ -131,9 +131,14 @@ export function Header({
               {menu.map((item) =>
                 item.children.length ? (
                   <li key={item.id}>
-                    <p className="px-3 pt-4 pb-1 text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    <Link
+                      href={href(locale, item.url || "/")}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-between rounded-lg px-3 py-3 text-base font-bold text-brand-800 hover:bg-brand-50"
+                    >
                       {pick(item.label, locale)}
-                    </p>
+                      <Icon name="arrow-right" className="h-4 w-4 text-accent-500 rtl:rotate-180" />
+                    </Link>
                     <ul className="space-y-1 border-s border-brand-100 ps-2">
                       {item.children.map((child) => (
                         <li key={child.id}>

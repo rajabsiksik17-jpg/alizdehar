@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { isLocale, pick } from "@/lib/i18n/config";
 import { buildMetadata } from "@/lib/seo";
+import { resolvePageBackground } from "@/lib/page-background";
 import { Section } from "@/components/sections";
+import { PageHero } from "@/components/page-hero";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { Reveal } from "@/components/reveal";
 
 export async function generateMetadata({
   params,
@@ -21,15 +22,10 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
   const { lang } = await params;
   const locale = isLocale(lang) ? lang : "en";
   const title = pick({ en: "Privacy Policy", ar: "سياسة الخصوصية" }, locale);
+  const background = await resolvePageBackground("privacy");
   return (
     <>
-      <section className="bg-brand-950 pt-36 pb-16 text-white">
-        <div className="mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
-          <Reveal>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">{title}</h1>
-          </Reveal>
-        </div>
-      </section>
+      <PageHero title={title} background={background} />
       <Breadcrumbs locale={locale} items={[{ name: title }]} />
       <Section bg="white">
         <div className="mx-auto max-w-3xl">

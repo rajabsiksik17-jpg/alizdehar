@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
-import { getServices } from "@/lib/content";
+import { getServices, getCargoTypes } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
+import { resolvePageBackground } from "@/lib/page-background";
 import { Section } from "@/components/sections";
+import { PageHero } from "@/components/page-hero";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Reveal } from "@/components/reveal";
 import { QuoteForm } from "@/components/forms/quote-form";
@@ -32,31 +34,25 @@ export default async function QuotePage({
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
 
-  const services = await getServices();
+  const [services, cargoTypes] = await Promise.all([getServices(), getCargoTypes()]);
   const dict = getDictionary(lang);
   const sp = await searchParams;
-  const defaultService = typeof sp.service === "string" ? sp.service : undefined;
+  const qService = typeof sp.service === "string" ? sp.service : undefined;
+
+  // Resolve the preselected service (accepts slug or localized name).
+  const defaultService = qService
+    ? (services.find(
+        (s) =>
+          s.slug === qService ||
+          s.name.en === qService ||
+          s.name.ar === qService,
+      )?.slug ?? undefined)
+    : undefined;
+  const background = await resolvePageBackground("quote");
 
   return (
     <>
-      <section className="relative overflow-hidden bg-brand-950 pt-36 pb-16 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.07]" aria-hidden="true">
-          <svg className="h-full w-full" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
-            <g fill="none" stroke="#fff" strokeWidth="1">
-              <circle cx="600" cy="200" r="180" />
-              <path d="M0 200H1200M600 0V400" />
-            </g>
-          </svg>
-        </div>
-        <div className="relative mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
-          <Reveal className="max-w-3xl">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {dict.quote.title}
-            </h1>
-            <p className="mt-5 text-lg leading-relaxed text-white/70">{dict.quote.subtitle}</p>
-          </Reveal>
-        </div>
-      </section>
+      <PageHero title={dict.quote.title} subtitle={dict.quote.subtitle} background={background} />
 
       <Breadcrumbs locale={lang} items={[{ name: dict.quote.title }]} />
 
@@ -66,7 +62,8 @@ export default async function QuotePage({
             <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft md:p-10">
               <QuoteForm
                 locale={lang}
-                services={services.map((s) => pick(s.name, lang))}
+                services={services.map((s) => ({ slug: s.slug, name: pick(s.name, lang) }))}
+                cargoTypes={cargoTypes.map((c) => pick(c, lang))}
                 defaultService={defaultService}
               />
             </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
-import { getServiceBySlug, getServices, getServiceSlugs } from "@/lib/content";
+import { getServiceBySlug, getServices, getServiceSlugs, getCargoTypes } from "@/lib/content";
 import {
   buildMetadata,
   serviceJsonLd,
@@ -16,6 +16,7 @@ import { Reveal } from "@/components/reveal";
 import { RichText } from "@/components/rich-text";
 import { Icon } from "@/components/icon";
 import { LocaleLink } from "@/components/link";
+import { QuoteForm } from "@/components/forms/quote-form";
 
 export async function generateStaticParams() {
   const slugs = await getServiceSlugs();
@@ -45,9 +46,10 @@ export default async function ServicePage({
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
 
-  const [service, allServices] = await Promise.all([
+  const [service, allServices, cargoTypes] = await Promise.all([
     getServiceBySlug(slug),
     getServices(),
+    getCargoTypes(),
   ]);
   if (!service) notFound();
 
@@ -225,6 +227,53 @@ export default async function ServicePage({
           </div>
         </section>
       ) : null}
+
+      {/* Request a Quote */}
+      <section className="bg-white py-16 md:py-24">
+        <div className="mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
+            <Reveal>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                <Icon name="handshake" className="h-6 w-6" />
+              </span>
+              <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-brand-900">
+                {dict.actions.requestQuote}
+              </h2>
+              <p className="mt-4 max-w-md leading-relaxed text-ink-muted">
+                {pick(
+                  {
+                    en: "Tell us about your shipment and our team will prepare a tailored solution for you.",
+                    ar: "أخبرنا عن شحنتك وسيقوم فريقنا بإعداد حل مخصص لك.",
+                  },
+                  lang,
+                )}
+              </p>
+              <ul className="mt-6 space-y-3">
+                {[
+                  pick({ en: "Fast response", ar: "استجابة سريعة" }, lang),
+                  pick({ en: "Tailored to your cargo", ar: "مخصصة لبضائعك" }, lang),
+                  pick({ en: "No obligation", ar: "بدون أي التزام" }, lang),
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm font-medium text-brand-900">
+                    <Icon name="check" className="h-4 w-4 text-accent-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="rounded-2xl border border-brand-100 bg-surface-muted p-6 shadow-soft md:p-8">
+                <QuoteForm
+                  locale={lang}
+                  services={allServices.map((s) => ({ slug: s.slug, name: pick(s.name, lang) }))}
+                  cargoTypes={cargoTypes.map((c) => pick(c, lang))}
+                  defaultService={service.slug}
+                />
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
 
       {/* Related services */}
       {related.length ? (

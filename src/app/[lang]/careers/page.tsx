@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
 import { getCareers } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
+import { href } from "@/lib/site";
+import { resolvePageBackground } from "@/lib/page-background";
 import { Section } from "@/components/sections";
+import { PageHero } from "@/components/page-hero";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Reveal } from "@/components/reveal";
 import { Icon } from "@/components/icon";
@@ -30,35 +33,21 @@ export default async function CareersPage({ params }: PageProps<"/[lang]/careers
 
   const careers = await getCareers();
   const dict = getDictionary(lang);
+  const background = await resolvePageBackground("careers");
 
   return (
     <>
-      <section className="relative overflow-hidden bg-brand-950 pt-36 pb-16 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.07]" aria-hidden="true">
-          <svg className="h-full w-full" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
-            <g fill="none" stroke="#fff" strokeWidth="1">
-              <circle cx="600" cy="200" r="180" />
-              <path d="M0 200H1200M600 0V400" />
-            </g>
-          </svg>
-        </div>
-        <div className="relative mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
-          <Reveal className="max-w-3xl">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {dict.nav.careers}
-            </h1>
-            <p className="mt-5 text-lg leading-relaxed text-white/70">
-              {pick(
-                {
-                  en: "Build your career with a team guided by experience and a commitment to excellence.",
-                  ar: "ابنِ مسيرتك المهنية مع فريق تقوده الخبرة والالتزام بالتميز.",
-                },
-                lang,
-              )}
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <PageHero
+        title={dict.nav.careers}
+        subtitle={pick(
+          {
+            en: "Build your career with a team guided by experience and a commitment to excellence.",
+            ar: "ابنِ مسيرتك المهنية مع فريق تقوده الخبرة والالتزام بالتميز.",
+          },
+          lang,
+        )}
+        background={background}
+      />
 
       <Breadcrumbs locale={lang} items={[{ name: dict.nav.careers }]} />
 
@@ -67,20 +56,44 @@ export default async function CareersPage({ params }: PageProps<"/[lang]/careers
           <div className="space-y-4">
             {careers.map((job, i) => (
               <Reveal key={job.id} delay={i * 60}>
-                <div className="flex flex-col gap-4 rounded-2xl border border-brand-100 bg-white p-6 shadow-soft sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold text-brand-900">{pick(job.title, lang)}</h2>
-                    <p className="mt-1 text-sm text-ink-muted">
-                      {pick(job.department, lang)} · {pick(job.location, lang)} · {pick(job.employment_type, lang)}
-                    </p>
+                <a
+                  href={href(lang, `/careers/${job.slug}`)}
+                  className="group flex flex-col gap-4 rounded-2xl border border-brand-100 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex items-start gap-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                      <Icon name="briefcase" className="h-6 w-6" />
+                    </span>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-lg font-bold text-brand-900">{pick(job.title, lang)}</h2>
+                        {job.demo ? (
+                          <span className="rounded-full bg-accent-100 px-2.5 py-0.5 text-[11px] font-semibold text-accent-700">
+                            {pick({ en: "Sample", ar: "عينة" }, lang)}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
+                        <span className="inline-flex items-center gap-1.5">
+                          <Icon name="building" className="h-3.5 w-3.5" />
+                          {pick(job.department, lang)}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Icon name="map-pin" className="h-3.5 w-3.5" />
+                          {pick(job.location, lang)}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Icon name="clock" className="h-3.5 w-3.5" />
+                          {pick(job.employment_type, lang)}
+                        </span>
+                      </p>
+                    </div>
                   </div>
-                  <a
-                    href={`/${lang}/quote`}
-                    className="shrink-0 rounded-xl bg-brand-800 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-                  >
+                  <span className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-brand-800 px-5 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-brand-700">
                     {dict.actions.applyNow}
-                  </a>
-                </div>
+                    <Icon name="arrow-right" className="h-4 w-4 rtl:rotate-180" />
+                  </span>
+                </a>
               </Reveal>
             ))}
           </div>

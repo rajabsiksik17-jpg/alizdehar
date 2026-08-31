@@ -13,6 +13,7 @@ import { seedSettings, seedMenu } from "@/content/settings";
 import { seedServices } from "@/content/services";
 import { homePage, seedWhyUs, seedStatistics } from "@/content/home";
 import { aboutPage } from "@/content/about";
+import { seedCareers, seedCargoTypes } from "@/content/misc";
 
 function loadEnv() {
   // Node 20.12+ helper — loads .env.local if present.
@@ -103,9 +104,10 @@ async function main() {
       .select("id")
       .single();
     if (insertedPage && sections.length) {
-      const sectionRows = sections.map((s) => ({
+      const sectionRows = sections.map((s, i) => ({
         ...stripId(s),
         page_id: insertedPage.id,
+        sort_order: i + 1,
       }));
       await admin.from("page_sections").insert(sectionRows);
     }
@@ -120,6 +122,16 @@ async function main() {
   await reset("statistics");
   await admin.from("statistics").insert(seedStatistics.map(stripId));
   console.log("✓ statistics");
+
+  await reset("careers");
+  await admin.from("careers").insert(seedCareers.map(stripId));
+  console.log(`✓ careers (${seedCareers.length} — demo)`);
+
+  await reset("cargo_types");
+  await admin.from("cargo_types").insert(
+    seedCargoTypes.map((label, i) => ({ label, sort_order: i + 1 })),
+  );
+  console.log(`✓ cargo_types (${seedCargoTypes.length})`);
 
   console.log("\nSeed complete. The public site will now read from Supabase.");
 }

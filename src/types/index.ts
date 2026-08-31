@@ -80,6 +80,7 @@ export interface SiteSettings {
   meta_pixel_id: string | null;
   google_site_verification: string | null;
   bing_site_verification: string | null;
+  page_background?: Record<string, unknown> | null;
   social_links: SocialLink[];
   design_tokens: DesignTokens;
 }
@@ -188,8 +189,11 @@ export interface Career {
   requirements: LocalizedText;
   responsibilities: LocalizedText;
   benefits: LocalizedText;
+  preferred: LocalizedText | null;
   deadline: string | null;
   status: Status;
+  /** Demo/sample placeholder flag — true until real vacancies are added. */
+  demo?: boolean;
 }
 
 /* ── Social proof ─────────────────────────────────────────── */
@@ -281,6 +285,22 @@ export interface Lead {
   payload: Record<string, unknown>;
   status: LeadStatus;
   created_at: string;
+  phone_country?: string | null;
+  phone_dial_code?: string | null;
+  phone_e164?: string | null;
+  service_slug?: string | null;
+  cargo_type?: string | null;
+  cargo_description?: string | null;
+  shipment_size?: string | null;
+  urgency?: string | null;
+  origin?: string | null;
+  destination?: string | null;
+  weight?: number | null;
+  weight_unit?: string | null;
+  dimensions?: Record<string, unknown> | null;
+  shipping_date?: string | null;
+  locale?: string | null;
+  source_page?: string | null;
 }
 
 /* ── Localized list helpers ───────────────────────────────── */

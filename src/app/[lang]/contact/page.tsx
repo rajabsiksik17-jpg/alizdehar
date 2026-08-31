@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
 import { getSettings } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
+import { resolvePageBackground } from "@/lib/page-background";
 import { Section } from "@/components/sections";
+import { PageHero } from "@/components/page-hero";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Reveal } from "@/components/reveal";
 import { Icon } from "@/components/icon";
@@ -32,35 +34,21 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
   const settings = await getSettings();
   const dict = getDictionary(lang);
   const hasInfo = settings.phone || settings.email || settings.address || settings.working_hours;
+  const background = await resolvePageBackground("contact");
 
   return (
     <>
-      <section className="relative overflow-hidden bg-brand-950 pt-36 pb-16 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.07]" aria-hidden="true">
-          <svg className="h-full w-full" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
-            <g fill="none" stroke="#fff" strokeWidth="1">
-              <circle cx="600" cy="200" r="180" />
-              <path d="M0 200H1200M600 0V400" />
-            </g>
-          </svg>
-        </div>
-        <div className="relative mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
-          <Reveal className="max-w-3xl">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {dict.nav.contact}
-            </h1>
-            <p className="mt-5 text-lg leading-relaxed text-white/70">
-              {pick(
-                {
-                  en: "We are here to help with your logistics and shipping needs.",
-                  ar: "نحن هنا لمساعدتك في احتياجاتك اللوجستية والشحن.",
-                },
-                lang,
-              )}
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <PageHero
+        title={dict.nav.contact}
+        subtitle={pick(
+          {
+            en: "We are here to help with your logistics and shipping needs.",
+            ar: "نحن هنا لمساعدتك في احتياجاتك اللوجستية والشحن.",
+          },
+          lang,
+        )}
+        background={background}
+      />
 
       <Breadcrumbs locale={lang} items={[{ name: dict.nav.contact }]} />
 

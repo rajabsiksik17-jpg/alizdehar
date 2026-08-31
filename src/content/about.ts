@@ -91,6 +91,23 @@ const aboutSections: PageSection[] = [
     sort_order: 3,
   },
   {
+    id: "about-trust",
+    type: "trust",
+    title: null,
+    subtitle: null,
+    body: null,
+    image: null,
+    items: [
+      { id: "at-1", label: localize("More than 40 years of experience", "خبرة تتجاوز 40 عاماً"), icon: "award" },
+      { id: "at-2", label: localize("Customs clearance expertise", "خبرة في التخليص الجمركي"), icon: "stamp" },
+      { id: "at-3", label: localize("Integrated logistics solutions", "حلول لوجستية متكاملة"), icon: "network" },
+      { id: "at-4", label: localize("Professional coordination", "تنسيق احترافي"), icon: "handshake" },
+    ],
+    settings: {},
+    hidden: false,
+    sort_order: 4,
+  },
+  {
     id: "about-new-chapter",
     type: "text_image",
     title: localize("A New Chapter in Our Journey", "فصل جديد في رحلتنا"),
@@ -124,6 +141,95 @@ const aboutSections: PageSection[] = [
     sort_order: 5,
   },
   {
+    id: "about-vision",
+    type: "rich_text",
+    title: localize("Our Vision", "رؤيتنا"),
+    subtitle: localize(
+      "A clear direction for the future of Al-Izdehar Logistics.",
+      "اتجاه واضح لمستقبل الإزدهار للوجستيات.",
+    ),
+    // DEMO/sample content — not present in the source document. Editable from the CMS.
+    body: localize(
+      "Our vision is to be the most trusted logistics and customs clearance partner in the region — recognized for reliability, professionalism and genuine care for every client and every shipment.",
+      "رؤيتنا أن نكون الشريك اللوجستي والتخليص الجمركي الأكثر موثوقية في المنطقة — معروفين بالموثوقية والاحترافية والاهتمام الحقيقي بكل عميل وكل شحنة.",
+    ),
+    image: null,
+    items: [],
+    settings: { align: "center", demo: true },
+    hidden: false,
+    sort_order: 6,
+  },
+  {
+    id: "about-values",
+    type: "features",
+    title: localize("Core Values", "قيمنا الأساسية"),
+    subtitle: null,
+    body: null,
+    image: null,
+    // DEMO/sample content — editable from the CMS.
+    items: [
+      {
+        id: "val-1",
+        title: localize("Integrity", "النزاهة"),
+        description: localize(
+          "We act with honesty and transparency in everything we do.",
+          "نتصرف بصدق وشفافية في كل ما نقوم به.",
+        ),
+        icon: "shield-check",
+        sort_order: 1,
+        enabled: true,
+      },
+      {
+        id: "val-2",
+        title: localize("Reliability", "الموثوقية"),
+        description: localize(
+          "We keep our commitments and handle every shipment with responsibility.",
+          "نفي بالتزاماتنا ونتعامل مع كل شحنة بمسؤولية.",
+        ),
+        icon: "route",
+        sort_order: 2,
+        enabled: true,
+      },
+      {
+        id: "val-3",
+        title: localize("Client Focus", "التركيز على العميل"),
+        description: localize(
+          "We treat our clients as partners and their success as our own.",
+          "نعامل عملاءنا كشركاء ونعتبر نجاحهم نجاحاً لنا.",
+        ),
+        icon: "heart-handshake",
+        sort_order: 3,
+        enabled: true,
+      },
+      {
+        id: "val-4",
+        title: localize("Excellence", "التميز"),
+        description: localize(
+          "We pursue high standards of quality and professionalism.",
+          "نسعى إلى معايير عالية من الجودة والاحترافية.",
+        ),
+        icon: "award",
+        sort_order: 4,
+        enabled: true,
+      },
+    ],
+    settings: { columns: 4, demo: true },
+    hidden: false,
+    sort_order: 7,
+  },
+  {
+    id: "about-why",
+    type: "features",
+    title: localize("Why Choose Al-Izdehar", "لماذا تختار الإزدهار"),
+    subtitle: null,
+    body: null,
+    image: null,
+    items: [],
+    settings: {},
+    hidden: false,
+    sort_order: 8,
+  },
+  {
     id: "about-services",
     type: "services_grid",
     title: localize("Our Services", "خدماتنا"),
@@ -136,7 +242,7 @@ const aboutSections: PageSection[] = [
     items: [],
     settings: {},
     hidden: false,
-    sort_order: 6,
+    sort_order: 9,
   },
   {
     id: "about-cta",
@@ -151,7 +257,7 @@ const aboutSections: PageSection[] = [
     ],
     settings: {},
     hidden: false,
-    sort_order: 7,
+    sort_order: 10,
   },
 ];
 

@@ -38,13 +38,10 @@
   --color-ink: #0b1d33;
   --color-ink-muted: #55647a;
 
-  /* Fonts (variables set in next/font) */
-  --font-sans: var(--font-inter), var(--font-cairo), ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-heading: var(--font-inter), var(--font-cairo), ui-sans-serif,
-    system-ui, sans-serif;
-  --font-arabic: var(--font-cairo), var(--font-inter), ui-sans-serif,
-    system-ui, sans-serif;
+  /* Fonts — Cairo is the single global font for Arabic + English */
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, sans-serif;
+  --font-heading: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
   /* Radius */
   --radius-4xl: 2rem;
@@ -130,10 +127,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Arabic typography */
+/* Arabic typography — Cairo handles both scripts; only adjust metrics */
 [dir="rtl"] body,
 [dir="rtl"] {
-  font-family: var(--font-arabic);
   letter-spacing: 0;
 }
 
@@ -146,7 +142,7 @@ h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.15;
-  color: var(--color-ink);
+  /* Color is inherited from the section context (dark-on-light / light-on-dark) */
 }
 
 [dir="rtl"] h1,
@@ -155,7 +151,6 @@ h6 {
 [dir="rtl"] h4,
 [dir="rtl"] h5,
 [dir="rtl"] h6 {
-  font-family: var(--font-arabic);
   line-height: 1.35;
 }
 

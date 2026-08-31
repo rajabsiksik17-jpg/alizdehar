@@ -80,10 +80,19 @@ Open http://localhost:3000 — you'll be redirected to `/en` or `/ar` based on y
 Once connected, the site reads content from Supabase; edit rows (or use `/admin`) and the
 changes appear immediately.
 
-### Admin login
+### Admin setup
 
 1. In Supabase **Authentication → Users**, create a user (email + password).
-2. Visit `/admin`, sign in with those credentials.
+   A `profiles` row is created automatically by a trigger (default role: `editor`).
+2. To make someone a full admin, set their role in the `profiles` table:
+
+   ```sql
+   update public.profiles set role = 'super_admin' where email = 'you@example.com';
+   ```
+
+   Roles: `super_admin`, `admin`, `editor`, `seo_manager`, `content_manager`.
+3. Visit `/admin`, sign in. No password is stored in source code — auth is fully
+   handled by Supabase Auth, and the service-role key is never sent to the browser.
 
 > Phone, email, address and social URLs are intentionally empty in the seed (they are not in
 > the source document). Set them under **Settings → General** in the admin or directly in the
@@ -212,8 +221,12 @@ against the production project (or use the same project), and optionally `npm ru
 
 ## Notes & scope
 
-- The public site and the CMS data model are complete. Content managers for each table
-  (Pages, Services, Blog, Leads, Media, Settings, …) are scaffolded in `/admin` and can be
-  built out incrementally — the public site is already fully CMS-driven.
+- The public site and the CMS data model are complete. The admin dashboard includes a
+  role-protected shell (sidebar, responsive) with working **Dashboard**, **General Settings**,
+  **Leads**, **Services** and **Pages** managers. Remaining modules (Blog, Media, Forms,
+  Menus, Social, SEO, Analytics, Users, Security…) are scaffolded in the sidebar and route to a
+  placeholder until their editors are built.
+- Demo content is clearly marked: sample careers (`demo: true`) and About-page Vision/Core
+  Values are editable placeholders, not company claims.
 - No invented facts, figures, clients, testimonials, locations or awards are included. All
-  content is from the provided source document and remains editable from the CMS.
+  approved content is from the provided source document and remains editable from the CMS.

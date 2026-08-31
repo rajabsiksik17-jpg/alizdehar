@@ -35,6 +35,7 @@ export const seedSettings: SiteSettings = {
   meta_pixel_id: null,
   google_site_verification: null,
   bing_site_verification: null,
+  page_background: null,
   social_links: [
     { id: "social-whatsapp", platform: "whatsapp", label: "WhatsApp", url: "", icon: "whatsapp", enabled: false, sort_order: 1 },
     { id: "social-facebook", platform: "facebook", label: "Facebook", url: "", icon: "facebook", enabled: false, sort_order: 2 },

@@ -11,6 +11,8 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const configured = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -19,13 +21,17 @@ export function LoginForm() {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setError(error.message);
+        setError(
+          error.message === "Invalid login credentials"
+            ? "Invalid email or password."
+            : error.message,
+        );
       } else {
         router.push("/admin");
         router.refresh();
       }
     } catch {
-      setError("Unable to sign in. Is Supabase configured?");
+      setError("Unable to sign in. Is Supabase configured correctly?");
     } finally {
       setLoading(false);
     }
@@ -33,6 +39,12 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {!configured ? (
+        <p className="rounded-lg bg-accent-50 px-3 py-2 text-xs text-accent-900">
+          Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+          in .env.local, then run supabase/schema.sql.
+        </p>
+      ) : null}
       <div>
         <label htmlFor="admin-email" className="mb-1.5 block text-sm font-semibold text-brand-900">
           Email
