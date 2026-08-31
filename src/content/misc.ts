@@ -4,6 +4,8 @@ import type {
   ClientLogo,
   GalleryItem,
   Testimonial,
+  ProcessStep,
+  ServiceFeature,
 } from "@/types";
 import { localize } from "@/lib/i18n/config";
 
@@ -167,4 +169,123 @@ export const seedCargoTypes = [
   localize("Perishable Goods", "بضائع قابلة للتلف"),
   localize("Oversized Cargo", "بضائع كبيرة الحجم"),
   localize("Other", "أخرى"),
+];
+
+/*
+ * Shared demo blocks — editable from the CMS.
+ * These are generic logistics process/value statements (not company facts).
+ */
+
+export const howItWorksSteps: ProcessStep[] = [
+  {
+    id: "how-1",
+    icon: "clipboard-list",
+    title: localize("Tell Us About Your Shipment", "أخبرنا عن شحنتك"),
+    description: localize(
+      "Share your shipment requirements, cargo details and preferred shipping date.",
+      "شارك متطلبات شحنتك وتفاصيل البضاعة وتاريخ الشحن المفضل.",
+    ),
+  },
+  {
+    id: "how-2",
+    icon: "puzzle",
+    title: localize("We Build the Right Solution", "نصمم الحل المناسب"),
+    description: localize(
+      "Our team evaluates your requirements and selects the appropriate logistics solution.",
+      "يقيّم فريقنا متطلباتك ويختار الحل اللوجستي المناسب.",
+    ),
+  },
+  {
+    id: "how-3",
+    icon: "workflow",
+    title: localize("We Coordinate the Journey", "ننسق رحلة الشحنة"),
+    description: localize(
+      "We coordinate transportation, documentation and required logistics processes.",
+      "ننسق النقل والمستندات والعمليات اللوجستية المطلوبة.",
+    ),
+  },
+  {
+    id: "how-4",
+    icon: "route",
+    title: localize("Your Cargo Moves", "تبدأ الشحنة رحلتها"),
+    description: localize(
+      "Your shipment moves through the selected transportation network with coordinated handling.",
+      "تتحرك شحنتك عبر شبكة النقل المختارة بمناولة منسقة.",
+    ),
+  },
+  {
+    id: "how-5",
+    icon: "monitor",
+    title: localize("We Keep You Informed", "نبقيك على اطلاع"),
+    description: localize(
+      "Receive updates and maintain visibility throughout the shipment journey.",
+      "استلم التحديثات وحافظ على الرؤية طوال رحلة الشحنة.",
+    ),
+  },
+  {
+    id: "how-6",
+    icon: "package-check",
+    title: localize("Delivery Completed", "تكتمل عملية التسليم"),
+    description: localize(
+      "Your shipment reaches its destination with coordinated delivery support.",
+      "تصل شحنتك إلى وجهتها مع دعم تسليم منسق.",
+    ),
+  },
+];
+
+export const whyChooseItems: ServiceFeature[] = [
+  {
+    id: "why-1",
+    icon: "shield-check",
+    title: localize("Experience You Can Rely On", "خبرة يمكنك الاعتماد عليها"),
+    description: localize(
+      "Decades of logistics experience supporting the movement of cargo across different transportation channels.",
+      "عقود من الخبرة اللوجستية تدعم حركة البضائع عبر قنوات نقل مختلفة.",
+    ),
+  },
+  {
+    id: "why-2",
+    icon: "workflow",
+    title: localize("Integrated Logistics Thinking", "حلول لوجستية متكاملة"),
+    description: localize(
+      "We coordinate multiple logistics requirements through a connected approach.",
+      "ننسق متطلبات لوجستية متعددة عبر نهج متصل.",
+    ),
+  },
+  {
+    id: "why-3",
+    icon: "sliders",
+    title: localize("Flexible Solutions", "حلول مرنة"),
+    description: localize(
+      "Solutions are adapted to shipment requirements rather than forcing every shipment into the same model.",
+      "تُكيّف الحلول وفق متطلبات الشحنة بدلاً من فرض نموذج واحد على كل شحنة.",
+    ),
+  },
+  {
+    id: "why-4",
+    icon: "message-square",
+    title: localize("Clear Communication", "تواصل واضح"),
+    description: localize(
+      "Clear communication and shipment updates help customers stay informed.",
+      "يساعد التواصل الواضح وتحديثات الشحن العملاء على البقاء على اطلاع.",
+    ),
+  },
+  {
+    id: "why-5",
+    icon: "clipboard-list",
+    title: localize("Professional Coordination", "تنسيق احترافي"),
+    description: localize(
+      "Careful coordination of documentation, transportation and shipment handling.",
+      "تنسيق دقيق للمستندات والنقل ومناولة الشحنات.",
+    ),
+  },
+  {
+    id: "why-6",
+    icon: "user-check",
+    title: localize("Customer-Focused Service", "خدمة تضع العميل أولاً"),
+    description: localize(
+      "Every shipment starts with understanding the customer's requirements.",
+      "تبدأ كل شحنة بفهم متطلبات العميل.",
+    ),
+  },
 ];

@@ -1,11 +1,24 @@
-import type { Service } from "@/types";
+import type { Service, ServiceOffer } from "@/types";
 import { localize } from "@/lib/i18n/config";
+import { howItWorksSteps, whyChooseItems } from "@/content/misc";
 
 /*
  * Service content is sourced from `AI-Izdehar Website.docx`.
  * No invented facts, figures or clients. All images are null (rendered as
  * branded placeholders) and are replaceable from the CMS / media library.
+ *
+ * "What We Offer" items, "How We Work" steps and "Why Choose" items are
+ * editable demo/source data — each carries an icon + bilingual title + text.
  */
+
+function offers(items: [string, string, string, string, string][]): ServiceOffer[] {
+  return items.map(([icon, en, ar, descEn, descAr], i) => ({
+    id: `offer-${i + 1}`,
+    icon,
+    title: localize(en, ar),
+    description: localize(descEn, descAr),
+  }));
+}
 
 export const seedServices: Service[] = [
   /* ── Sea Freight ─────────────────────────────────────────── */
@@ -60,33 +73,16 @@ export const seedServices: Service[] = [
         "سواء كنت تحتاج إلى شحنة تقليدية من الميناء إلى الميناء أو حلاً لوجستياً متكاملاً من الباب إلى الباب، يمكن للإزدهار للوجستيات تنسيق النقل وفقاً لمتطلباتك الخاصة. يتيح نهجنا المتكامل ربط الشحن البحري بوسائل نقل أخرى، بما في ذلك الشحن البري والجوي عند الحاجة، مما يخلق حلاً لوجستياً متكاملاً من نقطة الانطلاق إلى الوجهة النهائية.",
       ].join("\n\n"),
     ),
-    what_we_offer: [
-      localize("FCL and LCL shipments", "شحنات الحاوية الكاملة (FCL) والجزئية (LCL)"),
-      localize("Import and export shipments", "شحنات الاستيراد والتصدير"),
-      localize("Container booking and coordination", "حجز الحاويات والتنسيق"),
-      localize("Cargo collection and delivery", "جمع البضائع وتسليمها"),
-      localize("Port-to-port and door-to-door solutions", "حلول من الميناء إلى الميناء ومن الباب إلى الباب"),
-      localize("Transshipment and international routing", "إعادة الشحن والتوجيه الدولي"),
-      localize("Documentation and shipment coordination", "المستندات وتنسيق الشحنات"),
-      localize("Customs clearance support", "دعم التخليص الجمركي"),
-      localize("Cargo tracking and shipment updates", "تتبع البضائع وتحديثات الشحن"),
-      localize("Specialized and oversized cargo solutions", "حلول البضائع المتخصصة وكبيرة الحجم"),
-      localize("Coordination with ports, carriers, agents, and other logistics partners", "التنسيق مع الموانئ والناقلين والوكلاء وشركاء اللوجستيات"),
-    ],
-    features: [
-      localize("Experience You Can Trust", "خبرة يمكنك الوثوق بها"),
-      localize("Flexible Solutions", "حلول مرنة"),
-      localize("Cost Efficiency", "كفاءة في التكلفة"),
-      localize("Professional Coordination", "تنسيق احترافي"),
-      localize("End-to-End Support", "دعم شامل من البداية إلى النهاية"),
-      localize("Client-Focused Service", "خدمة تركز على العميل"),
-    ],
-    how_it_works: [
-      localize("Booking", "الحجز"),
-      localize("Cargo Collection", "جمع البضائع"),
-      localize("Ocean Transportation", "النقل البحري"),
-      localize("Customs & Delivery", "الجمارك والتسليم"),
-    ],
+    what_we_offer: offers([
+      ["container", "FCL Shipping", "شحن الحاويات الكاملة", "Full Container Load solutions for dedicated shipments.", "حلول الحاوية الكاملة للشحنات المخصصة."],
+      ["boxes", "LCL Shipping", "الشحن الأقل من حاوية", "Flexible Less-than-Container-Load solutions.", "حلول مرنة للشحنات الأقل من حمولة الحاوية."],
+      ["anchor", "Global Port Connectivity", "اتصال عالمي بالموانئ", "Coordinated international ocean freight movement.", "حركة شحن بحري دولية منسقة."],
+      ["map-pin", "Cargo Tracking", "تتبع البضائع", "Shipment visibility throughout the journey.", "رؤية الشحنة طوال الرحلة."],
+      ["waves", "Flexible Sailing Options", "خيارات إبحار مرنة", "Flexible routing and sailing options.", "خيارات توجيه وإبحار مرنة."],
+      ["package-check", "Cargo Handling", "مناولة البضائع", "Professional cargo handling coordination.", "تنسيق مناولة احترافي للبضائع."],
+    ]),
+    features: whyChooseItems,
+    how_it_works: howItWorksSteps,
     faq: [
       {
         id: "sea-faq-1",
@@ -203,35 +199,16 @@ export const seedServices: Service[] = [
         "يلعب الشحن البري دوراً مهماً في سلسلة التوريد العالمية من خلال ربط الموانئ والمطارات والمستودعات ومراكز التوزيع والوجهات النهائية. يمكن دمج حلول النقل البري لدينا مع خدمات الشحن البحري والجوي، مما يتيح لنا إنشاء حلول نقل متعدد الوسائط تدعم شحنتك من نقطة الانطلاق حتى الوجهة النهائية.",
       ].join("\n\n"),
     ),
-    what_we_offer: [
-      localize("Full Truckload (FTL) transportation", "نقل بالحمولة الكاملة (FTL)"),
-      localize("Less Than Truckload (LTL) transportation", "نقل بالحمولة الجزئية (LTL)"),
-      localize("Local and regional transportation", "نقل محلي وإقليمي"),
-      localize("Cross-border transportation", "نقل عبر الحدود"),
-      localize("Door-to-door delivery", "تسليم من الباب إلى الباب"),
-      localize("Port-to-door and door-to-port solutions", "حلول من الميناء إلى الباب ومن الباب إلى الميناء"),
-      localize("Cargo collection and final delivery", "جمع البضائع والتسليم النهائي"),
-      localize("Customs clearance support", "دعم التخليص الجمركي"),
-      localize("Transportation documentation and coordination", "مستندات النقل والتنسيق"),
-      localize("Shipment tracking and status updates", "تتبع الشحنات وتحديثات الحالة"),
-      localize("Container transportation by road", "نقل الحاويات براً"),
-      localize("General commercial cargo transportation", "نقل البضائع التجارية العامة"),
-    ],
-    features: [
-      localize("Experience You Can Trust", "خبرة يمكنك الوثوق بها"),
-      localize("Flexible Solutions", "حلول مرنة"),
-      localize("Regional & Cross-Border Connectivity", "اتصال إقليمي وعبر الحدود"),
-      localize("Customs Clearance Support", "دعم التخليص الجمركي"),
-      localize("Cost Efficiency", "كفاءة في التكلفة"),
-      localize("End-to-End Coordination", "تنسيق شامل من البداية إلى النهاية"),
-      localize("Client-Focused Service", "خدمة تركز على العميل"),
-    ],
-    how_it_works: [
-      localize("Planning", "التخطيط"),
-      localize("Cargo Collection", "جمع البضائع"),
-      localize("Road Transportation", "النقل البري"),
-      localize("Border & Delivery", "الحدود والتسليم"),
-    ],
+    what_we_offer: offers([
+      ["truck", "Full Truckload", "الحمولة الكاملة", "Dedicated truck transport for full loads.", "نقل شاحنة مخصص للأحمال الكاملة."],
+      ["boxes", "Less Than Truckload", "الحمولة الجزئية", "Cost-effective shared truck space for smaller loads.", "مساحة شاحنة مشتركة فعالة التكلفة للأحمال الأصغر."],
+      ["flag", "Cross-Border Transport", "النقل عبر الحدود", "Coordinated movement across borders.", "حركة منسقة عبر الحدود."],
+      ["route", "Route Planning", "تخطيط المسارات", "Efficient route planning and coordination.", "تخطيط وتنسيق فعال للمسارات."],
+      ["warehouse", "Door-to-Door Delivery", "التسليم من الباب إلى الباب", "Direct delivery from origin to destination.", "تسليم مباشر من نقطة الانطلاق إلى الوجهة."],
+      ["map-pin", "Shipment Visibility", "رؤية الشحنة", "Tracking and updates for road shipments.", "تتبع وتحديثات للشحنات البرية."],
+    ]),
+    features: whyChooseItems,
+    how_it_works: howItWorksSteps,
     faq: [
       {
         id: "land-faq-1",
@@ -339,36 +316,16 @@ export const seedServices: Service[] = [
         "قد تؤثر التأخيرات الجمركية على جداول التسليم وتخطيط المخزون وتكاليف اللوجستيات الإجمالية. ورغم أن أوقات وقرارات المعالجة الجمركية تحددها الجهات المعنية في النهاية، فإن الإعداد والتنسيق المناسبين يمكن أن يساعدا في تقليل التأخيرات التي يمكن تجنبها.",
       ].join("\n\n"),
     ),
-    what_we_offer: [
-      localize("Import customs clearance", "التخليص الجمركي للاستيراد"),
-      localize("Export customs clearance", "التخليص الجمركي للتصدير"),
-      localize("Transit and re-export procedures", "إجراءات العبور وإعادة التصدير"),
-      localize("Customs documentation preparation and coordination", "إعداد وتنسيق المستندات الجمركية"),
-      localize("Customs declarations and submission support", "البيانات الجمركية ودعم التقديم"),
-      localize("Classification and tariff-related support", "دعم التصنيف والتعرفة الجمركية"),
-      localize("Customs valuation support", "دعم التقييم الجمركي"),
-      localize("Coordination with customs authorities", "التنسيق مع الجهات الجمركية"),
-      localize("Port and terminal coordination", "التنسيق مع الموانئ والمحطات"),
-      localize("Shipping line and carrier coordination", "التنسيق مع خطوط الشحن والناقلين"),
-      localize("Inspection and examination coordination", "تنسيق الفحص والمعاينة"),
-      localize("Duty and tax calculation support", "دعم احتساب الرسوم والضرائب"),
-      localize("Release and delivery coordination", "تنسيق الإفراج والتسليم"),
-      localize("Customs-related consultation", "استشارات جمركية"),
-    ],
-    features: [
-      localize("More Than 40 Years of Experience", "خبرة تتجاوز 40 عاماً"),
-      localize("Experienced & Professional Team", "فريق خبير ومحترف"),
-      localize("Integrated Logistics Support", "دعم لوجستي متكامل"),
-      localize("Attention to Detail", "اهتمام بالتفاصيل"),
-      localize("Reliable Communication", "تواصل موثوق"),
-      localize("Client-Focused Approach", "نهج يركز على العميل"),
-    ],
-    how_it_works: [
-      localize("Document Review", "مراجعة المستندات"),
-      localize("Customs Declaration", "البيان الجمركي"),
-      localize("Coordination & Inspection", "التنسيق والمعاينة"),
-      localize("Release & Delivery", "الإفراج والتسليم"),
-    ],
+    what_we_offer: offers([
+      ["file-text", "Customs Documentation", "المستندات الجمركية", "Preparation and coordination of customs documents.", "إعداد وتنسيق المستندات الجمركية."],
+      ["arrow-right-left", "Import & Export Clearance", "تخليص الاستيراد والتصدير", "Clearance for incoming and outgoing shipments.", "تخليص الشحنات الواردة والصادرة."],
+      ["shield", "Regulatory Coordination", "التنسيق التنظيمي", "Coordination with regulatory authorities.", "التنسيق مع الجهات التنظيمية."],
+      ["shield-check", "Customs Compliance", "الامتثال الجمركي", "Compliance with customs requirements.", "الامتثال للمتطلبات الجمركية."],
+      ["calculator", "Duty & Tax Coordination", "تنسيق الرسوم والضرائب", "Support with duties and tax calculations.", "دعم احتساب الرسوم والضرائب."],
+      ["gauge", "Faster Clearance", "تخليص أسرع", "Efficient processing to reduce delays.", "معالجة فعالة لتقليل التأخير."],
+    ]),
+    features: whyChooseItems,
+    how_it_works: howItWorksSteps,
     faq: [
       {
         id: "customs-faq-1",
@@ -485,37 +442,16 @@ export const seedServices: Service[] = [
         "يمكن دمج الشحن الجوي مع خدمات اللوجستيات الأخرى لدينا لإنشاء حل نقل متكامل، مثل الشحن الجوي + الشحن البري + التخليص الجمركي.",
       ].join("\n\n"),
     ),
-    what_we_offer: [
-      localize("Import and export air freight", "شحن جوي للاستيراد والتصدير"),
-      localize("International air cargo transportation", "نقل البضائع الجوية الدولية"),
-      localize("Airport-to-airport solutions", "حلول من المطار إلى المطار"),
-      localize("Door-to-door air freight", "شحن جوي من الباب إلى الباب"),
-      localize("Airport-to-door delivery", "تسليم من المطار إلى الباب"),
-      localize("Time-sensitive and urgent shipments", "شحنات حساسة للوقت وعاجلة"),
-      localize("Commercial cargo transportation", "نقل البضائع التجارية"),
-      localize("High-value and sensitive cargo solutions", "حلول البضائع عالية القيمة والحساسة"),
-      localize("Cargo collection and delivery", "جمع البضائع وتسليمها"),
-      localize("Airway Bill (AWB) coordination", "تنسيق بوليصة الشحن الجوي (AWB)"),
-      localize("Shipment documentation support", "دعم مستندات الشحن"),
-      localize("Customs clearance support", "دعم التخليص الجمركي"),
-      localize("Cargo tracking and shipment updates", "تتبع البضائع وتحديثات الشحن"),
-      localize("Express services", "خدمات سريعة"),
-    ],
-    features: [
-      localize("Speed & Efficiency", "السرعة والكفاءة"),
-      localize("More Than 40 Years of Customs Experience", "خبرة جمركية تتجاوز 40 عاماً"),
-      localize("Global Connectivity", "اتصال عالمي"),
-      localize("Flexible Solutions", "حلول مرنة"),
-      localize("End-to-End Coordination", "تنسيق شامل من البداية إلى النهاية"),
-      localize("Professional Communication", "تواصل احترافي"),
-      localize("Client-Focused Service", "خدمة تركز على العميل"),
-    ],
-    how_it_works: [
-      localize("Cargo Collection", "جمع البضائع"),
-      localize("Airport Handling", "المناولة في المطار"),
-      localize("Air Transportation", "النقل الجوي"),
-      localize("Customs & Final Delivery", "الجمارك والتسليم النهائي"),
-    ],
+    what_we_offer: offers([
+      ["plane", "Express Air Cargo", "الشحن الجوي السريع", "Fast, priority air cargo movement.", "حركة شحن جوي سريعة وذات أولوية."],
+      ["timer", "Time-Critical Shipments", "الشحنات الحساسة للوقت", "Solutions for urgent, time-critical cargo.", "حلول للبضائع العاجلة والحساسة للوقت."],
+      ["globe", "Global Air Connectivity", "اتصال جوي عالمي", "Access to international air networks.", "الوصول إلى شبكات جوية دولية."],
+      ["box", "Cargo Handling", "مناولة البضائع", "Professional airport cargo handling.", "مناولة احترافية للبضائع في المطارات."],
+      ["map-pin", "Shipment Tracking", "تتبع الشحنة", "Visibility across the air journey.", "رؤية عبر رحلة الشحن الجوي."],
+      ["route", "Flexible Air Solutions", "حلول جوية مرنة", "Adaptable routing and scheduling.", "توجيه وجدولة قابلة للتكيف."],
+    ]),
+    features: whyChooseItems,
+    how_it_works: howItWorksSteps,
     faq: [
       {
         id: "air-faq-1",
@@ -627,31 +563,16 @@ export const seedServices: Service[] = [
         "يمكن للنهج اللوجستي المتكامل أن يساعد الأعمال على تحديد فرص تحسين كفاءة النقل والتحكم في التكاليف اللوجستية. هدفنا هو تطوير حل يوفر أفضل قيمة إجمالية لأعمالك.",
       ].join("\n\n"),
     ),
-    what_we_offer: [
-      localize("End-to-End Logistics Management", "إدارة لوجستية شاملة من البداية إلى النهاية"),
-      localize("Multimodal Transportation (Sea + Land, Air + Land)", "نقل متعدد الوسائط (بحري + بري، جوي + بري)"),
-      localize("Customs clearance integration", "دمج التخليص الجمركي"),
-      localize("Door-to-door logistics", "لوجستيات من الباب إلى الباب"),
-      localize("Supply chain coordination", "تنسيق سلسلة التوريد"),
-      localize("Warehousing and distribution", "التخزين والتوزيع"),
-      localize("Shipment visibility and communication", "رؤية الشحنات والتواصل"),
-      localize("Cost-efficient logistics planning", "تخطيط لوجستي فعال من حيث التكلفة"),
-    ],
-    features: [
-      localize("One Point of Contact", "نقطة اتصال واحدة"),
-      localize("More Than 40 Years of Experience", "خبرة تتجاوز 40 عاماً"),
-      localize("Complete Transportation Solutions", "حلول نقل متكاملة"),
-      localize("Professional Coordination", "تنسيق احترافي"),
-      localize("Flexible & Scalable", "مرونة وقابلية للتوسع"),
-      localize("Client-Focused Approach", "نهج يركز على العميل"),
-    ],
-    how_it_works: [
-      localize("Supplier / Origin", "المورد / نقطة الانطلاق"),
-      localize("Transportation", "النقل"),
-      localize("Port / Airport & Customs", "الميناء / المطار والجمارك"),
-      localize("Warehousing", "التخزين"),
-      localize("Final Delivery", "التسليم النهائي"),
-    ],
+    what_we_offer: offers([
+      ["workflow", "End-to-End Logistics", "لوجستيات من البداية إلى النهاية", "Coordinated logistics from origin to destination.", "لوجستيات منسقة من نقطة الانطلاق إلى الوجهة."],
+      ["network", "Multimodal Transportation", "النقل متعدد الوسائط", "Connected sea, land and air transport.", "نقل متصل بحري وبري وجوي."],
+      ["git-branch", "Supply Chain Coordination", "تنسيق سلسلة التوريد", "Coordination across supply chain stages.", "تنسيق عبر مراحل سلسلة التوريد."],
+      ["warehouse", "Warehousing & Distribution", "التخزين والتوزيع", "Storage and distribution support.", "دعم التخزين والتوزيع."],
+      ["monitor", "Shipment Visibility", "رؤية الشحنة", "Visibility across the entire journey.", "رؤية عبر الرحلة بأكملها."],
+      ["puzzle", "Tailored Logistics Solutions", "حلول لوجستية مخصصة", "Custom solutions built for your needs.", "حلول مخصصة مصممة لاحتياجاتك."],
+    ]),
+    features: whyChooseItems,
+    how_it_works: howItWorksSteps,
     faq: [
       {
         id: "int-faq-1",

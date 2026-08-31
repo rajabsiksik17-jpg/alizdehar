@@ -87,6 +87,27 @@ export interface SiteSettings {
 
 /* ── Services ─────────────────────────────────────────────── */
 
+export interface ServiceOffer {
+  id?: string;
+  icon: string;
+  title: LocalizedText;
+  description: LocalizedText;
+}
+
+export interface ProcessStep {
+  id?: string;
+  icon: string;
+  title: LocalizedText;
+  description: LocalizedText;
+}
+
+export interface ServiceFeature {
+  id?: string;
+  icon: string;
+  title: LocalizedText;
+  description: LocalizedText;
+}
+
 export interface Service {
   id: string;
   slug: string;
@@ -98,9 +119,9 @@ export interface Service {
   gallery: string[];
   icon: string | null;
   cta: Cta | null;
-  features: LocalizedText[];
-  how_it_works: LocalizedText[];
-  what_we_offer: LocalizedText[];
+  features: ServiceFeature[];
+  how_it_works: ProcessStep[];
+  what_we_offer: ServiceOffer[];
   faq: FaqItem[];
   related_services: string[];
   sort_order: number;

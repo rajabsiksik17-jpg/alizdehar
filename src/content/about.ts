@@ -43,28 +43,19 @@ const aboutSections: PageSection[] = [
       {
         id: "tl-1982",
         label: "1982",
-        title: localize("Founded", "التأسيس"),
+        title: localize("Foundation", "التأسيس"),
         description: localize(
-          "Al-Izdehar for Logistics and Customs Clearance was founded by Mr. Omer Al-Natour.",
-          "تأسست الإزدهار للوجستيات والتخليص الجمركي على يد السيد عمر الناطور.",
+          "The beginning of the company's journey in logistics and customs clearance.",
+          "بداية رحلة الشركة في اللوجستيات والتخليص الجمركي.",
         ),
       },
       {
-        id: "tl-growth",
-        label: localize("Growth", "النمو"),
-        title: localize("Growth & Experience", "النمو والخبرة"),
-        description: localize(
-          "Decades of credibility, reliability and high-quality services across various industries.",
-          "عقود من المصداقية والموثوقية والخدمات عالية الجودة في مختلف الصناعات.",
-        ),
-      },
-      {
-        id: "tl-40",
+        id: "tl-decades",
         label: "40+",
-        title: localize("More Than 40 Years", "أكثر من 40 عاماً"),
+        title: localize("More than four decades of experience", "أكثر من أربعة عقود من الخبرة"),
         description: localize(
-          "Recognized as one of the leading customs clearance firms in the market.",
-          "الاعتراف بها كإحدى شركات التخليص الجمركي الرائدة في السوق.",
+          "A period of accumulated expertise, credibility and reliable service.",
+          "فترة من الخبرة المتراكمة والمصداقية والخدمة الموثوقة.",
         ),
       },
       {
@@ -72,17 +63,8 @@ const aboutSections: PageSection[] = [
         label: "2026",
         title: localize("A New Chapter", "فصل جديد"),
         description: localize(
-          "We proudly introduce our sister company, Al-Izdehar Logistics.",
-          "نفخر بتقديم شركتنا الشقيقة، الإزدهار للوجستيات.",
-        ),
-      },
-      {
-        id: "tl-logistics",
-        label: localize("Today", "اليوم"),
-        title: localize("Al-Izdehar Logistics", "الإزدهار للوجستيات"),
-        description: localize(
-          "A specialized team in logistics and shipping, guided by visionary management and a commitment to excellence.",
-          "فريق متخصص في اللوجستيات والشحن، بقيادة إدارة ذات رؤية والتزام بالتميز.",
+          "Al-Izdehar Logistics is introduced as a new phase built on decades of experience.",
+          "تقديم الإزدهار للوجستيات كمرحلة جديدة مبنية على عقود من الخبرة.",
         ),
       },
     ],

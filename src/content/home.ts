@@ -1,5 +1,6 @@
 import type { Page, PageSection, Statistic, WhyUsItem } from "@/types";
 import { localize } from "@/lib/i18n/config";
+import { whyChooseItems } from "@/content/misc";
 
 /*
  * Homepage sections. Built as a reorderable section list so the admin can
@@ -133,7 +134,11 @@ const homeSections: PageSection[] = [
     body: null,
     image: null,
     items: [],
-    settings: { columns: 4 },
+    settings: {
+      eyebrow: localize("Why Us", "لماذا نحن"),
+      badge: localize("Years of experience", "سنوات من الخبرة"),
+      badgeValue: "40+",
+    },
     hidden: false,
     sort_order: 4,
   },
@@ -275,96 +280,14 @@ export const homePage: Page = {
 
 /* ── Why choose us (global reusable items) ─────────────────── */
 
-export const seedWhyUs: WhyUsItem[] = [
-  {
-    id: "why-1",
-    title: localize("More Than 40 Years of Experience", "خبرة تتجاوز 40 عاماً"),
-    description: localize(
-      "Backed by more than four decades of experience in customs clearance and international trade-related services.",
-      "مدعومون بأكثر من أربعة عقود من الخبرة في التخليص الجمركي والخدمات المتعلقة بالتجارة الدولية.",
-    ),
-    icon: "award",
-    sort_order: 1,
-    enabled: true,
-  },
-  {
-    id: "why-2",
-    title: localize("Professional Team", "فريق محترف"),
-    description: localize(
-      "A highly motivated and specialized team in logistics and shipping, guided by visionary management.",
-      "فريق متخصص ومتحمس في اللوجستيات والشحن، بقيادة إدارة ذات رؤية.",
-    ),
-    icon: "users",
-    sort_order: 2,
-    enabled: true,
-  },
-  {
-    id: "why-3",
-    title: localize("Flexible Solutions", "حلول مرنة"),
-    description: localize(
-      "Comprehensive, flexible and cost-effective logistics solutions tailored to every client.",
-      "حلول لوجستية شاملة ومرنة وفعالة من حيث التكلفة مصممة لكل عميل.",
-    ),
-    icon: "sliders",
-    sort_order: 3,
-    enabled: true,
-  },
-  {
-    id: "why-4",
-    title: localize("Cost Efficiency", "كفاءة في التكلفة"),
-    description: localize(
-      "Practical solutions that balance service quality, transit requirements and overall costs.",
-      "حلول عملية توازن بين جودة الخدمة ومتطلبات العبور والتكاليف الإجمالية.",
-    ),
-    icon: "coins",
-    sort_order: 4,
-    enabled: true,
-  },
-  {
-    id: "why-5",
-    title: localize("Global Connectivity", "اتصال عالمي"),
-    description: localize(
-      "A network of shipping and logistics partners connecting your business to international markets.",
-      "شبكة من شركاء الشحن واللوجستيات تربط أعمالك بالأسواق الدولية.",
-    ),
-    icon: "globe",
-    sort_order: 5,
-    enabled: true,
-  },
-  {
-    id: "why-6",
-    title: localize("Customs Expertise", "خبرة جمركية"),
-    description: localize(
-      "Decades of practical experience in handling customs procedures and requirements.",
-      "عقود من الخبرة العملية في التعامل مع الإجراءات والمتطلبات الجمركية.",
-    ),
-    icon: "stamp",
-    sort_order: 6,
-    enabled: true,
-  },
-  {
-    id: "why-7",
-    title: localize("End-to-End Support", "دعم شامل من البداية إلى النهاية"),
-    description: localize(
-      "From documentation and customs clearance to transportation and final delivery.",
-      "من المستندات والتخليص الجمركي إلى النقل والتسليم النهائي.",
-    ),
-    icon: "route",
-    sort_order: 7,
-    enabled: true,
-  },
-  {
-    id: "why-8",
-    title: localize("Client-Focused Service", "خدمة تركز على العميل"),
-    description: localize(
-      "We consider our clients our partners and treat every shipment as our own.",
-      "نعتبر عملاءنا شركاءنا ونتعامل مع كل شحنة كما لو كانت شحنتنا.",
-    ),
-    icon: "heart-handshake",
-    sort_order: 8,
-    enabled: true,
-  },
-];
+export const seedWhyUs: WhyUsItem[] = whyChooseItems.map((f, i) => ({
+  id: f.id ?? `why-${i + 1}`,
+  title: f.title,
+  description: f.description,
+  icon: f.icon,
+  sort_order: i + 1,
+  enabled: true,
+}));
 
 /* ── Statistics (only facts present in the source document) ── */
 

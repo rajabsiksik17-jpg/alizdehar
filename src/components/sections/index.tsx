@@ -292,29 +292,65 @@ function Features({
   locale: Locale;
   items: WhyUsItem[];
 }) {
-  const columns = (section.settings as { columns?: number }).columns || 4;
-  const colClass =
-    columns === 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-4";
+  const settings = (section.settings || {}) as {
+    eyebrow?: { en: string; ar: string };
+    badge?: { en: string; ar: string };
+    badgeValue?: string;
+  };
+
   return (
     <Section bg="white">
-      <SectionHeading title={pick(section.title, locale)} subtitle={pick(section.subtitle, locale)} />
-      {section.body ? (
-        <Reveal className="mx-auto -mt-6 mb-12 max-w-3xl text-center">
-          <p className="leading-relaxed text-ink-muted">{pick(section.body, locale)}</p>
+      <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+        <Reveal className="lg:col-span-5">
+          <div className="relative">
+            <MediaImage
+              src={section.image}
+              icon={section.image ? null : "network"}
+              alt={pick(section.title, locale)}
+              className="aspect-[4/5] rounded-3xl shadow-lift"
+            />
+            {settings.badge ? (
+              <div className="absolute -bottom-6 -end-4 hidden w-48 rounded-2xl bg-brand-800 p-5 text-white shadow-lift sm:block">
+                <p className="text-3xl font-extrabold text-accent-400">{settings.badgeValue || "40+"}</p>
+                <p className="mt-1 text-sm text-white/70">{pick(settings.badge, locale)}</p>
+              </div>
+            ) : null}
+          </div>
         </Reveal>
-      ) : null}
-      <div className={cn("grid gap-6", colClass)}>
-        {items.map((item, i) => (
-          <Reveal key={item.id} delay={i * 50}>
-            <div className="group h-full rounded-2xl border border-brand-100 bg-surface-muted p-6 transition-all duration-300 hover:border-brand-200 hover:bg-white hover:shadow-lift">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-800 text-white transition-colors group-hover:bg-accent-500 group-hover:text-brand-950">
-                <Icon name={item.icon} className="h-6 w-6" />
-              </span>
-              <h3 className="mt-5 text-base font-bold text-brand-900">{pick(item.title, locale)}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{pick(item.description, locale)}</p>
-            </div>
+
+        <div className="lg:col-span-7">
+          <Reveal className="mb-10">
+            {settings.eyebrow ? (
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-600">
+                {pick(settings.eyebrow, locale)}
+              </p>
+            ) : null}
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-brand-900 md:text-4xl">
+              {pick(section.title, locale)}
+            </h2>
+            {section.subtitle ? (
+              <p className="mt-4 max-w-xl leading-relaxed text-ink-muted">{pick(section.subtitle, locale)}</p>
+            ) : null}
+            {section.body ? (
+              <p className="mt-4 max-w-xl leading-relaxed text-ink-muted">{pick(section.body, locale)}</p>
+            ) : null}
           </Reveal>
-        ))}
+          <div className="grid gap-5 sm:grid-cols-2">
+            {items.map((item, i) => (
+              <Reveal key={item.id} delay={i * 50}>
+                <div className="group flex h-full gap-4 rounded-2xl border border-brand-100 bg-surface-muted p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-200 hover:bg-white hover:shadow-lift">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-800 text-white transition-colors duration-300 group-hover:bg-accent-500 group-hover:text-brand-950">
+                    <Icon name={item.icon} className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <h3 className="font-bold text-brand-900">{pick(item.title, locale)}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-muted">{pick(item.description, locale)}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </div>
     </Section>
   );
@@ -434,18 +470,41 @@ function Timeline({ section, locale }: { section: PageSection; locale: Locale })
   return (
     <Section bg="muted">
       <SectionHeading title={pick(section.title, locale)} />
-      <ol className="relative space-y-10 border-s-2 border-brand-100 ps-8">
+
+      {/* Horizontal (desktop) */}
+      <div className="relative hidden md:block">
+        <div className="absolute inset-x-0 top-10 h-px bg-gradient-to-r from-transparent via-brand-200 to-transparent" aria-hidden="true" />
+        <ol className="relative grid grid-cols-3 gap-8">
+          {items.map((item, i) => (
+            <Reveal key={item.id} delay={i * 100}>
+              <li className="flex flex-col items-center text-center">
+                <span className="relative z-10 flex h-20 w-20 items-center justify-center rounded-full border-4 border-surface-muted bg-brand-800 text-accent-400 shadow-soft">
+                  <span className="text-2xl font-extrabold tracking-tight text-white" dir="ltr">
+                    {pick(item.label, locale)}
+                  </span>
+                </span>
+                <h3 className="mt-6 text-lg font-bold text-brand-900">{pick(item.title, locale)}</h3>
+                <p className="mt-2 max-w-xs text-sm leading-relaxed text-ink-muted">
+                  {pick(item.description, locale)}
+                </p>
+              </li>
+            </Reveal>
+          ))}
+        </ol>
+      </div>
+
+      {/* Vertical (mobile) */}
+      <ol className="relative space-y-10 border-s-2 border-brand-200 ps-8 md:hidden">
         {items.map((item, i) => (
           <Reveal key={item.id} delay={i * 60}>
             <li className="relative">
-              <span className="absolute -start-[41px] top-1 flex h-6 w-6 items-center justify-center rounded-full bg-accent-500 ring-4 ring-surface-muted">
-                <span className="h-2 w-2 rounded-full bg-brand-950" />
+              <span className="absolute -start-[41px] top-0 flex h-16 w-16 items-center justify-center rounded-full bg-brand-800 ring-4 ring-surface-muted">
+                <span className="text-lg font-extrabold text-white" dir="ltr">
+                  {pick(item.label, locale)}
+                </span>
               </span>
-              <span className="text-xs font-bold uppercase tracking-widest text-accent-600">
-                {pick(item.label, locale)}
-              </span>
-              <h3 className="mt-1 text-xl font-bold text-brand-900">{pick(item.title, locale)}</h3>
-              <p className="mt-2 max-w-2xl leading-relaxed text-ink-muted">
+              <h3 className="text-lg font-bold text-brand-900">{pick(item.title, locale)}</h3>
+              <p className="mt-2 max-w-md leading-relaxed text-ink-muted">
                 {pick(item.description, locale)}
               </p>
             </li>

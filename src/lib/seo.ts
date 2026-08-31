@@ -31,6 +31,7 @@ export function buildMetadata(opts: {
       languages: {
         en: `/en${canonicalPath}`,
         ar: `/ar${canonicalPath}`,
+        "x-default": `/en${canonicalPath}`,
       },
     },
     openGraph: {

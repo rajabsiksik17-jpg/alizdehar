@@ -80,6 +80,32 @@ export async function getMenu(): Promise<MenuItem[]> {
 
 /* ── Services ─────────────────────────────────────────────── */
 
+/** True when a CMS array already uses the structured { icon, title, description } shape. */
+function isStructured(items: unknown): boolean {
+  if (!Array.isArray(items) || items.length === 0) return false;
+  const first = items[0];
+  return typeof first === "object" && first !== null && "title" in first;
+}
+
+/**
+ * Backwards-compatible coercion: if the database still holds the legacy
+ * shape (plain strings or `{ en, ar }` objects) for the redesigned sections,
+ * fall back to the bundled structured seed data so the UI renders correctly.
+ */
+function normalizeService(row: Service): Service {
+  const seed = seedServices.find((s) => s.slug === row.slug);
+  return {
+    ...row,
+    what_we_offer: isStructured(row.what_we_offer)
+      ? row.what_we_offer
+      : (seed?.what_we_offer ?? []),
+    how_it_works: isStructured(row.how_it_works)
+      ? row.how_it_works
+      : (seed?.how_it_works ?? []),
+    features: isStructured(row.features) ? row.features : (seed?.features ?? []),
+  };
+}
+
 export async function getServices(): Promise<Service[]> {
   const rows = await fromSupabase(async (c) => {
     const { data, error } = await c
@@ -90,7 +116,9 @@ export async function getServices(): Promise<Service[]> {
     if (error || !data?.length) return null;
     return data as Service[];
   });
-  return rows ?? seedServices.filter((s) => s.status === "published");
+  return rows
+    ? rows.map(normalizeService)
+    : seedServices.filter((s) => s.status === "published");
 }
 
 export async function getServiceBySlug(slug: string): Promise<Service | null> {
@@ -105,7 +133,9 @@ export async function getServiceBySlug(slug: string): Promise<Service | null> {
     return data as Service;
   });
   return (
-    row ?? seedServices.find((s) => s.slug === slug && s.status === "published") ?? null
+    (row ? normalizeService(row) : null) ??
+    seedServices.find((s) => s.slug === slug && s.status === "published") ??
+    null
   );
 }
 
