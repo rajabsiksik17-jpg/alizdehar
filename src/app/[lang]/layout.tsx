@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, dir, locales } from "@/lib/i18n/config";
 import { cairo } from "@/lib/fonts";
-import "../globals.css";
 import { getSettings, getMenu, getServices } from "@/lib/content";
+import { getAdminUser } from "@/lib/admin-auth";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SocialFloat } from "@/components/layout/social-float";
 import { CookieConsent } from "@/components/layout/cookie-consent";
+import { MaintenancePage } from "@/components/maintenance-page";
 
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -56,16 +57,30 @@ export default async function LangLayout({
     getServices(),
   ]);
 
+  // Maintenance mode — authenticated admins bypass it.
+  const maintenance = settings.maintenance_mode === true;
+  let isAdmin = false;
+  if (maintenance) {
+    const session = await getAdminUser();
+    isAdmin = !!session;
+  }
+
   return (
     <html lang={lang} dir={dir(lang)} className={`${cairo.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <JsonLd data={organizationJsonLd(settings)} />
         <JsonLd data={websiteJsonLd(settings)} />
-        <Header locale={lang} menu={menu} settings={settings} />
-        <main className="flex-1">{children}</main>
-        <Footer locale={lang} settings={settings} menu={menu} services={services} />
-        <SocialFloat socials={settings.social_links} locale={lang} />
-        <CookieConsent locale={lang} />
+        {maintenance && !isAdmin ? (
+          <MaintenancePage locale={lang} settings={settings} />
+        ) : (
+          <>
+            <Header locale={lang} menu={menu} settings={settings} />
+            <main className="flex-1">{children}</main>
+            <Footer locale={lang} settings={settings} menu={menu} services={services} />
+            <SocialFloat socials={settings.social_links} locale={lang} />
+            <CookieConsent locale={lang} />
+          </>
+        )}
       </body>
     </html>
   );

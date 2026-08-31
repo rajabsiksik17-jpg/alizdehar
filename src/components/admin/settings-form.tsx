@@ -45,6 +45,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
     working_hours_ar: settings.working_hours?.ar ?? "",
     ga_measurement_id: settings.ga_measurement_id ?? "",
     gtm_id: settings.gtm_id ?? "",
+    maintenance_mode: settings.maintenance_mode ?? false,
   });
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -110,6 +111,19 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <Field label="GA4 Measurement ID" value={form.ga_measurement_id} onChange={set("ga_measurement_id")} />
           <Field label="Google Tag Manager ID" value={form.gtm_id} onChange={set("gtm_id")} />
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
+        <h2 className="text-lg font-bold text-brand-900">Maintenance Mode</h2>
+        <label className="mt-4 flex items-center gap-3 text-sm text-brand-900">
+          <input
+            type="checkbox"
+            checked={form.maintenance_mode}
+            onChange={(e) => setForm((f) => ({ ...f, maintenance_mode: e.target.checked }))}
+            className="h-4 w-4 rounded border-brand-300"
+          />
+          Close the public website (admins can still access it)
+        </label>
       </section>
 
       <div className="flex items-center gap-4">

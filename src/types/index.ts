@@ -81,6 +81,7 @@ export interface SiteSettings {
   google_site_verification: string | null;
   bing_site_verification: string | null;
   page_background?: Record<string, unknown> | null;
+  maintenance_mode?: boolean;
   social_links: SocialLink[];
   design_tokens: DesignTokens;
 }
