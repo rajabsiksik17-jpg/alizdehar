@@ -375,6 +375,7 @@ alter table public.careers add column if not exists preferred jsonb;
 alter table public.careers add column if not exists demo boolean default false;
 alter table public.pages add column if not exists background jsonb;
 alter table public.settings add column if not exists page_background jsonb;
+alter table public.settings add column if not exists maintenance_mode boolean default false;
 
 -- Cargo types
 create table if not exists public.cargo_types (

@@ -5,8 +5,6 @@
  *   1. Fill NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local
  *   2. Run the schema (supabase/schema.sql) in the Supabase SQL editor
  *   3. npm run seed
- *
- * This resets and re-inserts the seed content for the managed tables.
  */
 import { createClient } from "@supabase/supabase-js";
 import { seedSettings, seedMenu } from "@/content/settings";
@@ -16,7 +14,6 @@ import { aboutPage } from "@/content/about";
 import { seedCareers, seedCargoTypes } from "@/content/misc";
 
 function loadEnv() {
-  // Node 20.12+ helper — loads .env.local if present.
   const load = (process as unknown as { loadEnvFile?: (p: string) => void }).loadEnvFile;
   if (load) {
     try {
@@ -45,98 +42,120 @@ const admin = createClient(url, serviceRole, {
 
 const ALL = "00000000-0000-0000-0000-000000000000";
 
-async function reset(table: string) {
-  const { error } = await admin.from(table).delete().neq("id", ALL);
-  if (error) {
-    // Some tables use integer/text PKs; fall back to upsert-only.
-    console.warn(`  (reset ${table} skipped: ${error.message})`);
-  }
+/** Remove keys that are not database columns. */
+function strip<T extends Record<string, unknown>>(row: T, keys: string[]): Record<string, unknown> {
+  const copy: Record<string, unknown> = { ...row };
+  keys.forEach((k) => delete copy[k]);
+  return copy;
 }
 
-function stripId<T extends { id?: unknown }>(row: T): Omit<T, "id"> {
-  const copy = { ...row };
-  delete copy.id;
-  return copy;
+function check(label: string, error: { message?: string } | null) {
+  if (error) {
+    console.error(`✗ ${label}: ${error.message}`);
+    throw new Error(`${label}: ${error.message}`);
+  }
+  console.log(`✓ ${label}`);
+}
+
+async function reset(table: string) {
+  const { error } = await admin.from(table).delete().neq("id", ALL);
+  if (error) console.warn(`  (reset ${table} skipped: ${error.message})`);
 }
 
 async function main() {
   console.log("Seeding Al-Izdehar Logistics…\n");
 
-  // 1. Settings (single row, id = 1)
-  await admin.from("settings").upsert(
-    { ...seedSettings, id: 1 },
-    { onConflict: "id" },
-  );
-  console.log("✓ settings");
+  // 1. Settings (single row, id = 1) — strip fields that may not exist as columns.
+  const settingsRow = strip(seedSettings as unknown as Record<string, unknown>, [
+    "social_links",
+    "maintenance_mode",
+  ]);
+  const { error: settingsErr } = await admin
+    .from("settings")
+    .upsert({ ...settingsRow, id: 1 }, { onConflict: "id" });
+  check("settings", settingsErr);
 
-  // 2. Menu (flatten parent/children)
+  // 2. Social links (separate table).
+  await reset("social_links");
+  const socialRows = (seedSettings.social_links || []).map((s) =>
+    strip(s as unknown as Record<string, unknown>, ["id"]),
+  );
+  if (socialRows.length) {
+    const { error: socialErr } = await admin.from("social_links").insert(socialRows);
+    check(`social_links (${socialRows.length})`, socialErr);
+  }
+
+  // 3. Menu (flatten parent/children).
   await reset("menu_items");
   for (const parent of seedMenu) {
-    const { data: inserted } = await admin
+    const parentRow = strip(parent as unknown as Record<string, unknown>, ["id", "children"]);
+    const { data: inserted, error: parentErr } = await admin
       .from("menu_items")
-      .insert(stripId(parent))
+      .insert(parentRow)
       .select("id")
       .single();
+    check(`menu item "${parentRow.url}"`, parentErr);
     if (parent.children.length && inserted) {
-      const children = parent.children.map((c) => ({
-        ...stripId(c),
+      const childRows = parent.children.map((c) => ({
+        ...strip(c as unknown as Record<string, unknown>, ["id", "children"]),
         parent_id: inserted.id,
       }));
-      await admin.from("menu_items").insert(children);
+      const { error: childErr } = await admin.from("menu_items").insert(childRows);
+      check(`menu children (${childRows.length})`, childErr);
     }
   }
-  console.log("✓ menu_items");
 
-  // 3. Services
+  // 4. Services.
   await reset("services");
-  const serviceRows = seedServices.map(stripId);
-  await admin.from("services").insert(serviceRows);
-  console.log(`✓ services (${serviceRows.length})`);
+  const serviceRows = seedServices.map((s) => strip(s as unknown as Record<string, unknown>, ["id"]));
+  const { error: servicesErr } = await admin.from("services").insert(serviceRows);
+  check(`services (${serviceRows.length})`, servicesErr);
 
-  // 4. Pages + sections
+  // 5. Pages + sections.
   await reset("page_sections");
   await reset("pages");
   for (const page of [homePage, aboutPage]) {
-    const { sections, ...pageRow } = page;
-    const { data: insertedPage } = await admin
+    const pageRow = strip(page as unknown as Record<string, unknown>, ["id", "sections"]);
+    const { data: insertedPage, error: pageErr } = await admin
       .from("pages")
       .insert(pageRow)
       .select("id")
       .single();
-    if (insertedPage && sections.length) {
-      const sectionRows = sections.map((s, i) => ({
-        ...stripId(s),
+    check(`page "${pageRow.slug}"`, pageErr);
+    if (insertedPage && page.sections.length) {
+      const sectionRows = page.sections.map((s, i) => ({
+        ...strip(s as unknown as Record<string, unknown>, ["id"]),
         page_id: insertedPage.id,
         sort_order: i + 1,
       }));
-      await admin.from("page_sections").insert(sectionRows);
+      const { error: secErr } = await admin.from("page_sections").insert(sectionRows);
+      check(`sections for "${pageRow.slug}" (${sectionRows.length})`, secErr);
     }
   }
-  console.log("✓ pages + sections (home, about)");
 
-  // 5. Global blocks
+  // 6. Global blocks.
   await reset("why_us");
-  await admin.from("why_us").insert(seedWhyUs.map(stripId));
-  console.log("✓ why_us");
+  const { error: whyErr } = await admin.from("why_us").insert(seedWhyUs.map((w) => strip(w as unknown as Record<string, unknown>, ["id"])));
+  check("why_us", whyErr);
 
   await reset("statistics");
-  await admin.from("statistics").insert(seedStatistics.map(stripId));
-  console.log("✓ statistics");
+  const { error: statErr } = await admin.from("statistics").insert(seedStatistics.map((s) => strip(s as unknown as Record<string, unknown>, ["id"])));
+  check("statistics", statErr);
 
   await reset("careers");
-  await admin.from("careers").insert(seedCareers.map(stripId));
-  console.log(`✓ careers (${seedCareers.length} — demo)`);
+  const { error: careersErr } = await admin.from("careers").insert(seedCareers.map((c) => strip(c as unknown as Record<string, unknown>, ["id"])));
+  check(`careers (${seedCareers.length} — demo)`, careersErr);
 
   await reset("cargo_types");
-  await admin.from("cargo_types").insert(
+  const { error: cargoErr } = await admin.from("cargo_types").insert(
     seedCargoTypes.map((label, i) => ({ label, sort_order: i + 1 })),
   );
-  console.log(`✓ cargo_types (${seedCargoTypes.length})`);
+  check(`cargo_types (${seedCargoTypes.length})`, cargoErr);
 
   console.log("\nSeed complete. The public site will now read from Supabase.");
 }
 
 main().catch((err) => {
-  console.error("Seed failed:", err.message ?? err);
+  console.error("Seed failed:", err instanceof Error ? err.message : err);
   process.exit(1);
 });
