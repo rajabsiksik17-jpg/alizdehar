@@ -22,6 +22,8 @@ export default async function ServiceEditPage({
       short_description: svc.short_description,
       content: svc.content,
       icon: svc.icon ?? "ship",
+      hero_image: svc.hero_image ?? "",
+      thumbnail: svc.thumbnail ?? "",
       status: svc.status,
       sort_order: svc.sort_order,
       what_we_offer: svc.what_we_offer.map((o) => ({ icon: o.icon, title: o.title, description: o.description })),

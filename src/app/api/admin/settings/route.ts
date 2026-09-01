@@ -63,6 +63,8 @@ export async function POST(request: Request) {
   }
   if (body.ga_measurement_id !== undefined) row.ga_measurement_id = pick(body.ga_measurement_id);
   if (body.gtm_id !== undefined) row.gtm_id = pick(body.gtm_id);
+  if (body.logo !== undefined) row.logo = pick(body.logo);
+  if (body.favicon !== undefined) row.favicon = pick(body.favicon);
   if (body.default_og_image !== undefined) row.default_og_image = pick(body.default_og_image);
   if (body.google_site_verification !== undefined)
     row.google_site_verification = pick(body.google_site_verification);

@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { LogoMark } from "@/components/layout/logo";
 import { Icon } from "@/components/icon";
-
-type Lang = "en" | "ar";
+import { useAdminLang } from "@/components/admin/lang";
 
 interface NavItem {
   label: string;
@@ -80,25 +79,7 @@ export function AdminShell({
   const pathname = usePathname() || "";
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [lang, setLang] = useState<Lang>("en");
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      const saved = localStorage.getItem("admin-locale");
-      if (saved === "ar" || saved === "en") setLang(saved);
-    });
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-    localStorage.setItem("admin-locale", lang);
-  }, [lang]);
-
-  function t(en: string, ar: string) {
-    return lang === "ar" ? ar : en;
-  }
+  const { lang, setLang, t } = useAdminLang();
 
   async function signOut() {
     const supabase = createClient();
@@ -187,7 +168,7 @@ export function AdminShell({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setLang((l) => (l === "en" ? "ar" : "en"))}
+              onClick={() => setLang(lang === "en" ? "ar" : "en")}
               className="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 px-3 py-1.5 text-xs font-semibold text-brand-800 transition-colors hover:bg-brand-50"
             >
               <Icon name="globe" className="h-3.5 w-3.5" />

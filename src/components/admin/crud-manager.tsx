@@ -4,24 +4,26 @@ import { useCallback, useEffect, useState } from "react";
 import type { AdminEntity, AdminField } from "@/lib/admin-registry";
 import { Icon } from "@/components/icon";
 import { IconPicker } from "@/components/admin/icon-picker";
+import { useAdminLang } from "@/components/admin/lang";
 
 type Row = Record<string, unknown>;
 
 const inputCls =
   "w-full rounded-lg border border-brand-200 bg-white px-3 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
-function fieldValue(row: Row, field: AdminField): string {
+function fieldValue(row: Row, field: AdminField, lang: "en" | "ar"): string {
   const v = row[field.name];
   if (v == null) return "";
   if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") return String(v);
   if (typeof v === "object") {
     const o = v as { en?: string; ar?: string };
-    return o.en || o.ar || "";
+    return o[lang] || o.en || o.ar || "";
   }
   return "";
 }
 
 export function CrudManager({ entity }: { entity: AdminEntity }) {
+  const { lang, t } = useAdminLang();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,28 +59,30 @@ export function CrudManager({ entity }: { entity: AdminEntity }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-ink-muted">{rows.length} record(s)</p>
+        <p className="text-sm text-ink-muted">
+          {rows.length} {t("record(s)", "سجل")}
+        </p>
         <button
           type="button"
           onClick={() => setEditing({})}
           className="inline-flex items-center gap-2 rounded-lg bg-brand-800 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
         >
           <Icon name="plus" className="h-4 w-4" />
-          Add {entity.singular}
+          {t(`Add ${entity.singular}`, `إضافة ${entity.singularAr}`)}
         </button>
       </div>
 
       {error ? <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p> : null}
 
       {loading ? (
-        <p className="py-10 text-center text-sm text-ink-muted">Loading…</p>
+        <p className="py-10 text-center text-sm text-ink-muted">{t("Loading…", "جارٍ التحميل…")}</p>
       ) : rows.length ? (
         <div className="overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-soft">
           <ul className="divide-y divide-brand-50">
             {rows.map((row) => (
               <li key={String(row.id)} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-brand-900">{fieldValue(row, titleField) || "—"}</p>
+                  <p className="truncate font-medium text-brand-900">{fieldValue(row, titleField, lang) || "—"}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <button
@@ -86,14 +90,14 @@ export function CrudManager({ entity }: { entity: AdminEntity }) {
                     onClick={() => setEditing(row)}
                     className="rounded-lg border border-brand-200 px-3 py-1.5 text-xs font-semibold text-brand-800 transition-colors hover:bg-brand-50"
                   >
-                    Edit
+                    {t("Edit", "تعديل")}
                   </button>
                   <button
                     type="button"
                     onClick={() => remove(row.id as string)}
                     className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
                   >
-                    Delete
+                    {t("Delete", "حذف")}
                   </button>
                 </div>
               </li>
@@ -102,7 +106,7 @@ export function CrudManager({ entity }: { entity: AdminEntity }) {
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-brand-200 bg-white py-12 text-center">
-          <p className="text-sm text-ink-muted">No records yet.</p>
+          <p className="text-sm text-ink-muted">{t("No records yet.", "لا توجد سجلات بعد.")}</p>
         </div>
       )}
 
@@ -164,6 +168,8 @@ function EditModal({
   onClose: () => void;
   onSave: (form: Row) => void;
 }) {
+  const { lang, t } = useAdminLang();
+  const fl = (f: AdminField) => (lang === "ar" ? f.labelAr : f.label);
   const [form, setForm] = useState<Row>(() => {
     const init: Row = {};
     for (const f of entity.fields) {
@@ -198,9 +204,9 @@ function EditModal({
       <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white p-6 shadow-lift sm:max-w-lg sm:rounded-2xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-bold text-brand-900">
-            {initial.id ? `Edit ${entity.singular}` : `Add ${entity.singular}`}
+            {initial.id ? t(`Edit ${entity.singular}`, `تعديل ${entity.singularAr}`) : t(`Add ${entity.singular}`, `إضافة ${entity.singularAr}`)}
           </h3>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 text-brand-800 hover:bg-brand-50">
+          <button type="button" onClick={onClose} aria-label={t("Close", "إغلاق")} className="rounded-lg p-2 text-brand-800 hover:bg-brand-50">
             <Icon name="x" className="h-5 w-5" />
           </button>
         </div>
@@ -231,14 +237,14 @@ function EditModal({
                     onChange={(e) => set(f.name, e.target.checked)}
                     className="h-4 w-4 rounded border-brand-300"
                   />
-                  {f.label}
+                  {fl(f)}
                 </label>
               );
             }
             if (f.type === "textarea") {
               return (
                 <div key={f.name}>
-                  <label className="mb-1 block text-xs font-semibold text-brand-900">{f.label}</label>
+                  <label className="mb-1 block text-xs font-semibold text-brand-900">{fl(f)}</label>
                   <textarea value={String(form[f.name] ?? "")} onChange={(e) => set(f.name, e.target.value)} rows={4} className={inputCls} />
                 </div>
               );
@@ -261,16 +267,16 @@ function EditModal({
             if (f.type === "icon") {
               return (
                 <div key={f.name}>
-                  <IconPicker label={f.label} value={String(form[f.name] ?? "")} onChange={(v) => set(f.name, v)} />
+                  <IconPicker label={fl(f)} value={String(form[f.name] ?? "")} onChange={(v) => set(f.name, v)} />
                 </div>
               );
             }
             if (f.type === "select") {
               return (
                 <div key={f.name}>
-                  <label className="mb-1 block text-xs font-semibold text-brand-900">{f.label}</label>
+                  <label className="mb-1 block text-xs font-semibold text-brand-900">{fl(f)}</label>
                   <select value={String(form[f.name] ?? "")} onChange={(e) => set(f.name, e.target.value)} className={inputCls}>
-                    <option value="">Select…</option>
+                    <option value="">{t("Select…", "اختر…")}</option>
                     {f.options?.map((o) => (
                       <option key={o.value} value={o.value}>
                         {o.label}
@@ -282,7 +288,7 @@ function EditModal({
             }
             return (
               <div key={f.name}>
-                <label className="mb-1 block text-xs font-semibold text-brand-900">{f.label}</label>
+                <label className="mb-1 block text-xs font-semibold text-brand-900">{fl(f)}</label>
                 <input
                   type={f.type === "number" ? "number" : "text"}
                   value={String(form[f.name] ?? "")}
@@ -296,7 +302,7 @@ function EditModal({
 
         <div className="mt-5 flex justify-end gap-3">
           <button type="button" onClick={onClose} className="rounded-lg border border-brand-200 px-4 py-2 text-sm font-semibold text-brand-800 hover:bg-brand-50">
-            Cancel
+            {t("Cancel", "إلغاء")}
           </button>
           <button
             type="button"
@@ -304,7 +310,7 @@ function EditModal({
             disabled={saving}
             className="rounded-lg bg-brand-800 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? t("Saving…", "جارٍ الحفظ…") : t("Save", "حفظ")}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { SiteSettings } from "@/types";
 import { Icon } from "@/components/icon";
+import { MediaPicker } from "@/components/admin/media-picker";
 
 const input =
   "w-full rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted/50 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
@@ -45,6 +46,8 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
     working_hours_ar: settings.working_hours?.ar ?? "",
     ga_measurement_id: settings.ga_measurement_id ?? "",
     gtm_id: settings.gtm_id ?? "",
+    logo: settings.logo ?? "",
+    favicon: settings.favicon ?? "",
     maintenance_mode: settings.maintenance_mode ?? false,
   });
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
@@ -87,6 +90,10 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         <div className="mt-4 space-y-4">
           <Field label="Site description (EN)" value={form.site_description_en} onChange={set("site_description_en")} />
           <Field label="وصف الموقع (AR)" value={form.site_description_ar} onChange={set("site_description_ar")} dir="rtl" />
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <MediaPicker label="Logo" value={form.logo} onChange={(v) => setForm((f) => ({ ...f, logo: v }))} />
+          <MediaPicker label="Favicon" value={form.favicon} onChange={(v) => setForm((f) => ({ ...f, favicon: v }))} />
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icon";
 import { IconPicker } from "@/components/admin/icon-picker";
+import { MediaPicker } from "@/components/admin/media-picker";
 
 type L = { en: string; ar: string };
 type OfferItem = { icon: string; title: L; description: L };
@@ -15,6 +16,8 @@ interface ServiceForm {
   short_description: L;
   content: L;
   icon: string;
+  hero_image: string;
+  thumbnail: string;
   status: "draft" | "published";
   sort_order: number;
   what_we_offer: OfferItem[];
@@ -128,6 +131,8 @@ export function ServiceEditor({
       short_description: { en: "", ar: "" },
       content: { en: "", ar: "" },
       icon: "ship",
+      hero_image: "",
+      thumbnail: "",
       status: "draft",
       sort_order: 0,
       what_we_offer: [],
@@ -196,6 +201,10 @@ export function ServiceEditor({
               <label className={lbl}>Order</label>
               <input type="number" value={form.sort_order} onChange={(e) => set("sort_order", Number(e.target.value))} className={input} />
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <MediaPicker label="Hero image" value={form.hero_image} onChange={(v) => set("hero_image", v)} />
+            <MediaPicker label="Thumbnail" value={form.thumbnail} onChange={(v) => set("thumbnail", v)} />
           </div>
           <LocalizedField label="Short description" labelAr="الوصف المختصر" value={form.short_description} onChange={(v) => set("short_description", v)} textarea />
           <LocalizedField label="Full description" labelAr="الوصف الكامل" value={form.content} onChange={(v) => set("content", v)} textarea />
