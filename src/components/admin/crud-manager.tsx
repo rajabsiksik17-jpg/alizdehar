@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AdminEntity, AdminField } from "@/lib/admin-registry";
 import { Icon } from "@/components/icon";
+import { IconPicker } from "@/components/admin/icon-picker";
 
 type Row = Record<string, unknown>;
 
@@ -239,6 +240,43 @@ function EditModal({
                 <div key={f.name}>
                   <label className="mb-1 block text-xs font-semibold text-brand-900">{f.label}</label>
                   <textarea value={String(form[f.name] ?? "")} onChange={(e) => set(f.name, e.target.value)} rows={4} className={inputCls} />
+                </div>
+              );
+            }
+            if (f.type === "localized-textarea") {
+              const val = (form[f.name] as { en: string; ar: string }) || { en: "", ar: "" };
+              return (
+                <div key={f.name} className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-brand-900">{f.label} (EN)</label>
+                    <textarea value={val.en} onChange={(e) => setLocalized(f.name, "en", e.target.value)} rows={4} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-brand-900">{f.labelAr} (AR)</label>
+                    <textarea value={val.ar} onChange={(e) => setLocalized(f.name, "ar", e.target.value)} rows={4} dir="rtl" className={inputCls} />
+                  </div>
+                </div>
+              );
+            }
+            if (f.type === "icon") {
+              return (
+                <div key={f.name}>
+                  <IconPicker label={f.label} value={String(form[f.name] ?? "")} onChange={(v) => set(f.name, v)} />
+                </div>
+              );
+            }
+            if (f.type === "select") {
+              return (
+                <div key={f.name}>
+                  <label className="mb-1 block text-xs font-semibold text-brand-900">{f.label}</label>
+                  <select value={String(form[f.name] ?? "")} onChange={(e) => set(f.name, e.target.value)} className={inputCls}>
+                    <option value="">Select…</option>
+                    {f.options?.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               );
             }

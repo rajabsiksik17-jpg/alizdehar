@@ -1,6 +1,15 @@
 import "server-only";
 
-export type FieldType = "text" | "textarea" | "boolean" | "number" | "localized" | "json";
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "localized-textarea"
+  | "boolean"
+  | "number"
+  | "localized"
+  | "icon"
+  | "select"
+  | "json";
 
 export interface AdminField {
   name: string;
@@ -8,6 +17,7 @@ export interface AdminField {
   labelAr: string;
   type: FieldType;
   required?: boolean;
+  options?: { value: string; label: string }[];
 }
 
 export interface AdminEntity {
@@ -36,7 +46,7 @@ export const adminEntities: AdminEntity[] = [
     fields: [
       { name: "platform", label: "Platform", labelAr: "المنصة", type: "text", required: true },
       { name: "label", label: "Label", labelAr: "التسمية", type: "text" },
-      { name: "icon", label: "Icon", labelAr: "الأيقونة", type: "text" },
+      { name: "icon", label: "Icon", labelAr: "الأيقونة", type: "icon" },
       { name: "url", label: "URL", labelAr: "الرابط", type: "text" },
       { name: "enabled", label: "Enabled", labelAr: "مفعّل", type: "boolean" },
       { name: "sort_order", label: "Order", labelAr: "الترتيب", type: "number" },
@@ -65,7 +75,7 @@ export const adminEntities: AdminEntity[] = [
     singularAr: "عنصر",
     orderBy: "sort_order",
     fields: [
-      { name: "icon", label: "Icon", labelAr: "الأيقونة", type: "text" },
+      { name: "icon", label: "Icon", labelAr: "الأيقونة", type: "icon" },
       { name: "title", label: "Title", labelAr: "العنوان", type: "localized", required: true },
       { name: "description", label: "Description", labelAr: "الوصف", type: "localized" },
       { name: "sort_order", label: "Order", labelAr: "الترتيب", type: "number" },
@@ -141,6 +151,74 @@ export const adminEntities: AdminEntity[] = [
     fields: [
       { name: "label", label: "Label", labelAr: "التسمية", type: "localized", required: true },
       { name: "sort_order", label: "Order", labelAr: "الترتيب", type: "number" },
+    ],
+  },
+  {
+    table: "blog_posts",
+    label: "Blog Posts",
+    labelAr: "المقالات",
+    singular: "Post",
+    singularAr: "مقال",
+    orderBy: "created_at",
+    orderAsc: false,
+    fields: [
+      { name: "title", label: "Title", labelAr: "العنوان", type: "localized", required: true },
+      { name: "slug", label: "Slug", labelAr: "الرابط", type: "text" },
+      { name: "status", label: "Status", labelAr: "الحالة", type: "select", options: [{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }] },
+      { name: "category", label: "Category", labelAr: "التصنيف", type: "text" },
+      { name: "author", label: "Author", labelAr: "الكاتب", type: "localized" },
+      { name: "excerpt", label: "Excerpt", labelAr: "المقتطف", type: "localized-textarea" },
+      { name: "content", label: "Content", labelAr: "المحتوى", type: "localized-textarea" },
+      { name: "cover_image", label: "Cover image URL", labelAr: "رابط صورة الغلاف", type: "text" },
+    ],
+  },
+  {
+    table: "careers",
+    label: "Careers",
+    labelAr: "الوظائف",
+    singular: "Job",
+    singularAr: "وظيفة",
+    orderBy: "created_at",
+    orderAsc: false,
+    fields: [
+      { name: "title", label: "Job title", labelAr: "المسمى الوظيفي", type: "localized", required: true },
+      { name: "slug", label: "Slug", labelAr: "الرابط", type: "text" },
+      { name: "department", label: "Department", labelAr: "القسم", type: "localized" },
+      { name: "location", label: "Location", labelAr: "الموقع", type: "localized" },
+      { name: "employment_type", label: "Employment type", labelAr: "نوع الوظيفة", type: "localized" },
+      { name: "status", label: "Status", labelAr: "الحالة", type: "select", options: [{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }] },
+      { name: "description", label: "Description", labelAr: "الوصف", type: "localized-textarea" },
+      { name: "responsibilities", label: "Responsibilities", labelAr: "المسؤوليات", type: "localized-textarea" },
+      { name: "requirements", label: "Requirements", labelAr: "المتطلبات", type: "localized-textarea" },
+      { name: "benefits", label: "Benefits", labelAr: "المزايا", type: "localized-textarea" },
+    ],
+  },
+  {
+    table: "menu_items",
+    label: "Menus",
+    labelAr: "القوائم",
+    singular: "Menu item",
+    singularAr: "عنصر قائمة",
+    orderBy: "sort_order",
+    fields: [
+      { name: "label", label: "Label", labelAr: "التسمية", type: "localized", required: true },
+      { name: "url", label: "URL", labelAr: "الرابط", type: "text" },
+      { name: "page", label: "Page", labelAr: "الصفحة", type: "text" },
+      { name: "external", label: "External", labelAr: "رابط خارجي", type: "boolean" },
+      { name: "enabled", label: "Enabled", labelAr: "مفعّل", type: "boolean" },
+      { name: "sort_order", label: "Order", labelAr: "الترتيب", type: "number" },
+    ],
+  },
+  {
+    table: "blog_categories",
+    label: "Blog Categories",
+    labelAr: "تصنيفات المدونة",
+    singular: "Category",
+    singularAr: "تصنيف",
+    orderBy: "slug",
+    fields: [
+      { name: "name", label: "Name", labelAr: "الاسم", type: "localized", required: true },
+      { name: "slug", label: "Slug", labelAr: "الرابط", type: "text" },
     ],
   },
 ];

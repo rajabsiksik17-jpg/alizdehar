@@ -14,6 +14,12 @@ const slugToTable: Record<string, string> = {
   gallery: "gallery",
   redirects: "redirects",
   "cargo-types": "cargo_types",
+  blog: "blog_posts",
+  posts: "blog_posts",
+  careers: "careers",
+  jobs: "careers",
+  menus: "menu_items",
+  categories: "blog_categories",
 };
 
 export default async function AdminModulePage({

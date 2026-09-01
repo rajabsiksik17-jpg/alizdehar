@@ -30,6 +30,10 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Pages", labelAr: "الصفحات", href: "/admin/pages", icon: "file-text" },
       { label: "Services", labelAr: "الخدمات", href: "/admin/services", icon: "ship" },
+      { label: "Blog", labelAr: "المدونة", href: "/admin/blog", icon: "calendar" },
+      { label: "Categories", labelAr: "تصنيفات المدونة", href: "/admin/categories", icon: "layout-grid" },
+      { label: "Careers", labelAr: "الوظائف", href: "/admin/careers", icon: "briefcase" },
+      { label: "Menus", labelAr: "القوائم", href: "/admin/menus", icon: "menu" },
       { label: "Media", labelAr: "الصور والوسائط", href: "/admin/media", icon: "package" },
       { label: "Statistics", labelAr: "الإحصائيات", href: "/admin/statistics", icon: "bar-chart" },
       { label: "Why Al-Izdehar", labelAr: "لماذا الازدهار", href: "/admin/why-us", icon: "award" },
