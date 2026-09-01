@@ -3,6 +3,7 @@ import { getEntity, adminEntities } from "@/lib/admin-registry";
 import { CrudManager } from "@/components/admin/crud-manager";
 import { MediaLibrary } from "@/components/admin/media-library";
 import { SeoSettings } from "@/components/admin/seo-settings";
+import { EmailSettings } from "@/components/admin/email-settings";
 
 const slugToTable: Record<string, string> = {
   social: "social_links",
@@ -14,8 +15,6 @@ const slugToTable: Record<string, string> = {
   gallery: "gallery",
   redirects: "redirects",
   "cargo-types": "cargo_types",
-  blog: "blog_posts",
-  posts: "blog_posts",
   careers: "careers",
   jobs: "careers",
   menus: "menu_items",
@@ -51,6 +50,18 @@ export default async function AdminModulePage({
         <p className="mt-1 text-sm text-ink-muted">Global search engine settings.</p>
         <div className="mt-6">
           <SeoSettings />
+        </div>
+      </div>
+    );
+  }
+
+  if (slug === "email" || slug === "smtp" || slug === "imap") {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-brand-900">Email Settings</h1>
+        <p className="mt-1 text-sm text-ink-muted">SMTP / IMAP configuration and notifications.</p>
+        <div className="mt-6">
+          <EmailSettings />
         </div>
       </div>
     );

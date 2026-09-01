@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { AdminEntity, AdminField } from "@/lib/admin-registry";
 import { Icon } from "@/components/icon";
 import { IconPicker } from "@/components/admin/icon-picker";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { useAdminLang } from "@/components/admin/lang";
 
 type Row = Record<string, unknown>;
@@ -201,7 +202,7 @@ function EditModal({
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-brand-950/50 p-0 sm:items-center sm:p-4">
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white p-6 shadow-lift sm:max-w-lg sm:rounded-2xl">
+      <div className="relative max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white p-6 shadow-lift sm:max-w-3xl sm:rounded-2xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-bold text-brand-900">
             {initial.id ? t(`Edit ${entity.singular}`, `تعديل ${entity.singularAr}`) : t(`Add ${entity.singular}`, `إضافة ${entity.singularAr}`)}
@@ -268,6 +269,13 @@ function EditModal({
               return (
                 <div key={f.name}>
                   <IconPicker label={fl(f)} value={String(form[f.name] ?? "")} onChange={(v) => set(f.name, v)} />
+                </div>
+              );
+            }
+            if (f.type === "image") {
+              return (
+                <div key={f.name}>
+                  <MediaPicker label={fl(f)} value={String(form[f.name] ?? "")} onChange={(v) => set(f.name, v)} />
                 </div>
               );
             }

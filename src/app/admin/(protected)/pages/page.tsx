@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { Icon } from "@/components/icon";
 
-const seedPages = [
+const knownPages = [
   { slug: "home", title: "Home", status: "published" },
   { slug: "about", title: "About Us", status: "published" },
   { slug: "services", title: "Services", status: "published" },
@@ -18,21 +18,28 @@ const seedPages = [
 export default async function AdminPagesPage() {
   await requireAdmin();
 
-  let pages: { slug: string; title: string; status: string }[] = [];
+  const bySlug = new Map(knownPages.map((p) => [p.slug, p]));
+
   if (isSupabaseConfigured()) {
     try {
       const admin = createAdminClient();
       const { data } = await admin.from("pages").select("slug,title,status").order("slug");
-      pages = (data ?? []).map((p: { slug: string; title: { en: string }; status: string }) => ({
-        slug: p.slug,
-        title: p.title?.en ?? p.slug,
-        status: p.status,
-      }));
+      for (const p of data ?? []) {
+        const row = p as { slug: string; title: { en?: string }; status: string };
+        if (bySlug.has(row.slug)) {
+          const existing = bySlug.get(row.slug)!;
+          existing.title = row.title?.en ?? existing.title;
+          existing.status = row.status;
+        } else {
+          bySlug.set(row.slug, { slug: row.slug, title: row.title?.en ?? row.slug, status: row.status });
+        }
+      }
     } catch {
-      pages = [];
+      // ignore
     }
   }
-  if (!pages.length) pages = seedPages;
+
+  const pages = Array.from(bySlug.values());
 
   return (
     <div>

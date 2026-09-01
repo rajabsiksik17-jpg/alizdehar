@@ -16,6 +16,7 @@ type Slide = {
   icon?: string;
   url?: string;
   cta?: { en: string; ar: string };
+  background?: string;
 };
 
 export function HeroSlider({ section, locale }: { section: PageSection; locale: Locale }) {
@@ -35,9 +36,14 @@ export function HeroSlider({ section, locale }: { section: PageSection; locale: 
 
   if (!slides.length) return null;
   const slide = slides[active % slides.length];
+  const background = slide.background || section.image || null;
 
   return (
     <section className="relative overflow-hidden bg-brand-950 pt-32 pb-20 text-white md:pt-40 md:pb-28">
+      {background ? (
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${background})` }} aria-hidden="true" />
+      ) : null}
+      <div className="absolute inset-0 bg-brand-950/85" aria-hidden="true" />
       <HeroPattern />
       <div className="relative mx-auto grid max-w-[var(--container-content)] items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         {/* Main message */}

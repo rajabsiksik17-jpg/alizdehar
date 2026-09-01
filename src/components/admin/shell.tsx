@@ -36,8 +36,6 @@ const navGroups: NavGroup[] = [
       { label: "Media", labelAr: "الصور والوسائط", href: "/admin/media", icon: "package" },
       { label: "Statistics", labelAr: "الإحصائيات", href: "/admin/statistics", icon: "bar-chart" },
       { label: "Why Al-Izdehar", labelAr: "لماذا الازدهار", href: "/admin/why-us", icon: "award" },
-      { label: "Testimonials", labelAr: "آراء العملاء", href: "/admin/testimonials", icon: "quote" },
-      { label: "Clients", labelAr: "العملاء", href: "/admin/clients", icon: "handshake" },
       { label: "Gallery", labelAr: "المعرض", href: "/admin/gallery", icon: "boxes" },
       { label: "Cargo Types", labelAr: "أنواع البضائع", href: "/admin/cargo-types", icon: "container" },
     ],
@@ -63,7 +61,10 @@ const navGroups: NavGroup[] = [
   {
     label: "Settings",
     labelAr: "الإعدادات",
-    items: [{ label: "General Settings", labelAr: "الإعدادات العامة", href: "/admin/settings", icon: "sliders" }],
+    items: [
+      { label: "General Settings", labelAr: "الإعدادات العامة", href: "/admin/settings", icon: "sliders" },
+      { label: "Email", labelAr: "البريد الإلكتروني", href: "/admin/email", icon: "mail" },
+    ],
   },
 ];
 

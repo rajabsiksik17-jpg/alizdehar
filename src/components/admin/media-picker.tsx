@@ -90,6 +90,16 @@ export function MediaPicker({
         )}
         <span className="text-xs text-brand-600">{t("Change", "تغيير")}</span>
       </button>
+      {value ? (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700"
+        >
+          <Icon name="x" className="h-3.5 w-3.5" />
+          {t("Remove image", "إزالة الصورة")}
+        </button>
+      ) : null}
 
       {open ? (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">

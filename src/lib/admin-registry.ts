@@ -8,6 +8,7 @@ export type FieldType =
   | "number"
   | "localized"
   | "icon"
+  | "image"
   | "select"
   | "json";
 
@@ -109,7 +110,7 @@ export const adminEntities: AdminEntity[] = [
     fields: [
       { name: "name", label: "Name", labelAr: "الاسم", type: "text", required: true },
       { name: "url", label: "URL", labelAr: "الرابط", type: "text" },
-      { name: "logo", label: "Logo URL", labelAr: "رابط الشعار", type: "text" },
+      { name: "logo", label: "Logo", labelAr: "الشعار", type: "image" },
       { name: "sort_order", label: "Order", labelAr: "الترتيب", type: "number" },
       { name: "enabled", label: "Enabled", labelAr: "مفعّل", type: "boolean" },
     ],
@@ -122,7 +123,7 @@ export const adminEntities: AdminEntity[] = [
     singularAr: "صورة",
     orderBy: "sort_order",
     fields: [
-      { name: "src", label: "Image URL", labelAr: "رابط الصورة", type: "text", required: true },
+      { name: "src", label: "Image", labelAr: "الصورة", type: "image", required: true },
       { name: "alt", label: "Alt text", labelAr: "النص البديل", type: "localized" },
       { name: "category", label: "Category", labelAr: "التصنيف", type: "text" },
       { name: "sort_order", label: "Order", labelAr: "الترتيب", type: "number" },
@@ -169,7 +170,7 @@ export const adminEntities: AdminEntity[] = [
       { name: "author", label: "Author", labelAr: "الكاتب", type: "localized" },
       { name: "excerpt", label: "Excerpt", labelAr: "المقتطف", type: "localized-textarea" },
       { name: "content", label: "Content", labelAr: "المحتوى", type: "localized-textarea" },
-      { name: "cover_image", label: "Cover image URL", labelAr: "رابط صورة الغلاف", type: "text" },
+      { name: "cover_image", label: "Cover image", labelAr: "صورة الغلاف", type: "image" },
     ],
   },
   {
