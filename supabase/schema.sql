@@ -377,6 +377,10 @@ alter table public.pages add column if not exists background jsonb;
 alter table public.settings add column if not exists page_background jsonb;
 alter table public.settings add column if not exists maintenance_mode boolean default false;
 
+-- Notifications: read flag on leads
+alter table public.leads add column if not exists is_read boolean default false;
+create index if not exists leads_unread_idx on public.leads (is_read, created_at desc);
+
 -- Cargo types
 create table if not exists public.cargo_types (
   id uuid primary key default gen_random_uuid(),

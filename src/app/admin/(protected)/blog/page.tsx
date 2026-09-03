@@ -4,7 +4,7 @@ import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { Icon } from "@/components/icon";
 
 export default async function AdminBlogPage() {
-  await requireAdmin();
+  await requireAdmin("content");
 
   let posts: { slug: string; title: { en?: string }; status: string }[] = [];
   if (isSupabaseConfigured()) {

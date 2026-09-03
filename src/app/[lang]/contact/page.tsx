@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
-import { getSettings } from "@/lib/content";
+import { getSettings, getServices } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { resolvePageBackground } from "@/lib/page-background";
 import { Section } from "@/components/sections";
@@ -31,7 +31,7 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
 
-  const settings = await getSettings();
+  const [settings, services] = await Promise.all([getSettings(), getServices()]);
   const dict = getDictionary(lang);
   const hasInfo = settings.phone || settings.email || settings.address || settings.working_hours;
   const background = await resolvePageBackground("contact");
@@ -135,7 +135,10 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
                 {pick({ en: "Send us a message", ar: "أرسل لنا رسالة" }, lang)}
               </h2>
               <div className="mt-6">
-                <ContactForm locale={lang} />
+                <ContactForm
+                  locale={lang}
+                  services={services.map((s) => ({ slug: s.slug, name: pick(s.name, lang) }))}
+                />
               </div>
             </div>
           </Reveal>
@@ -143,11 +146,26 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       </Section>
 
       {settings.map_embed ? (
-        <Section bg="white" className="!py-0">
-          <div
-            className="overflow-hidden rounded-2xl shadow-soft"
-            dangerouslySetInnerHTML={{ __html: settings.map_embed }}
-          />
+        <Section bg="white" className="!py-12">
+          <div className="mx-auto max-w-[var(--container-content)] px-4 sm:px-6 lg:px-8">
+            <Reveal className="mb-8 text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-600">
+                {pick({ en: "Our Location", ar: "موقعنا" }, lang)}
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-brand-900">
+                {pick({ en: "Find Us", ar: "أين تجدنا" }, lang)}
+              </h2>
+            </Reveal>
+            <div className="overflow-hidden rounded-3xl border border-brand-100 shadow-soft">
+              <iframe
+                src={settings.map_embed}
+                title={pick({ en: "Company location", ar: "موقع الشركة" }, lang)}
+                className="h-[320px] w-full sm:h-[420px]"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
         </Section>
       ) : null}
     </>

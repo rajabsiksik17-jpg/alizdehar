@@ -3,7 +3,7 @@ import { getSettings } from "@/lib/content";
 import { SettingsForm } from "@/components/admin/settings-form";
 
 export default async function AdminSettingsPage() {
-  await requireAdmin();
+  await requireAdmin("settings");
   const settings = await getSettings();
 
   return (

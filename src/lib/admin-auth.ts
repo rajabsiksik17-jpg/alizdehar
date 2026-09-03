@@ -1,7 +1,9 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { isSupabaseConfigured } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { hasPermission, type Permission } from "@/lib/admin-permissions";
 
 export type AdminRole =
   | "super_admin"
@@ -44,12 +46,24 @@ export async function getAdminUser(): Promise<AdminSession | null> {
 }
 
 /** Protect an admin route — redirects to /admin/login when unauthenticated. */
-export async function requireAdmin(): Promise<AdminSession> {
+export async function requireAdmin(permission?: Permission): Promise<AdminSession> {
   const session = await getAdminUser();
   if (!session) redirect("/admin/login");
+  if (permission && !hasPermission(session.role, permission)) redirect("/admin");
   return session;
 }
 
 export function canManage(session: AdminSession): boolean {
   return session.role === "super_admin" || session.role === "admin";
+}
+
+/** API guard — returns a 401/403 response when the caller is not authorized, else null. */
+export async function requireApiPermission(
+  permission: Permission,
+): Promise<NextResponse | null> {
+  const session = await getAdminUser();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!hasPermission(session.role, permission))
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  return null;
 }

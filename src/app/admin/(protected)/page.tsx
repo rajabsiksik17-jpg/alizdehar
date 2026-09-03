@@ -32,7 +32,7 @@ export default async function AdminDashboard() {
           admin.from("leads").select("id", { count: "exact", head: true }).eq("type", "quote"),
           admin.from("leads").select("id", { count: "exact", head: true }).eq("type", "contact"),
           admin.from("leads").select("id", { count: "exact", head: true }).eq("type", "career"),
-          admin.from("leads").select("id", { count: "exact", head: true }).eq("status", "new"),
+          admin.from("leads").select("id", { count: "exact", head: true }).eq("is_read", false),
           admin.from("leads").select("*").order("created_at", { ascending: false }).limit(6),
         ]);
       stats = {

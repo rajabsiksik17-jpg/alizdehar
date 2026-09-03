@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { getAdminUser, requireApiPermission } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/svg+xml", "image/gif"];
@@ -20,8 +20,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
 
   let form: FormData;
   try {
@@ -64,8 +65,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
 
   let body: { id?: string; url?: string };
   try {

@@ -77,6 +77,10 @@ Open http://localhost:3000 — you'll be redirected to `/en` or `/ar` based on y
    npm run seed
    ```
 
+> Upgrading an existing database? Apply the incremental scripts in
+> [`supabase/migrations/`](supabase/migrations/) in order (they are all idempotent, using
+> `IF NOT EXISTS`).
+
 Once connected, the site reads content from Supabase; edit rows (or use `/admin`) and the
 changes appear immediately.
 
@@ -223,9 +227,15 @@ against the production project (or use the same project), and optionally `npm ru
 
 - The public site and the CMS data model are complete. The admin dashboard includes a
   role-protected shell (sidebar, responsive) with working **Dashboard**, **General Settings**,
-  **Leads**, **Services** and **Pages** managers. Remaining modules (Blog, Media, Forms,
-  Menus, Social, SEO, Analytics, Users, Security…) are scaffolded in the sidebar and route to a
-  placeholder until their editors are built.
+  **Leads**, **Services**, **Pages**, **Blog** (with a rich-text markdown editor), **Media**,
+  **Menus**, **Social**, **SEO**, **Email**, **Statistics/Why/Gallery/Cargo/Careers/Categories**
+  (generic CRUD), **Users & Permissions** (role management) and a live **Notifications** bell
+  (unread-lead badge with mark-as-read).
+- Admin roles (super_admin → admin → content_manager → seo_manager → editor) gate both the
+  sidebar navigation and the server-side pages/APIs, so each role only sees the modules it is
+  allowed to use.
+- New leads are marked unread and surface in the header notification bell; reading/marking them
+  clears the badge.
 - Demo content is clearly marked: sample careers (`demo: true`) and About-page Vision/Core
   Values are editable placeholders, not company claims.
 - No invented facts, figures, clients, testimonials, locations or awards are included. All

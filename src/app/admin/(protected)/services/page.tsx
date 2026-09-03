@@ -5,7 +5,7 @@ import { pick } from "@/lib/i18n/config";
 import { Icon } from "@/components/icon";
 
 export default async function AdminServicesPage() {
-  await requireAdmin();
+  await requireAdmin("content");
   const services = await getServices();
 
   return (

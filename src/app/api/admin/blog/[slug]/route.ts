@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { getAdminUser, requireApiPermission } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 function unauthorized() {
@@ -27,8 +27,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
   const { slug } = await params;
   let body: Record<string, unknown>;
   try {
@@ -46,8 +47,9 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
   const { slug } = await params;
   const admin = createAdminClient();
   const { error } = await admin.from("blog_posts").delete().eq("slug", slug);

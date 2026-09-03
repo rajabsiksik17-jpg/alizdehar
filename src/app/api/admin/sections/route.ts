@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { getAdminUser, requireApiPermission } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 function unauthorized() {
@@ -28,8 +28,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
 
   let body: Record<string, unknown>;
   try {

@@ -307,6 +307,7 @@ export interface Lead {
   payload: Record<string, unknown>;
   status: LeadStatus;
   created_at: string;
+  is_read?: boolean | null;
   phone_country?: string | null;
   phone_dial_code?: string | null;
   phone_e164?: string | null;

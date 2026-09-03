@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { requireApiPermission } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 function unauthorized() {
@@ -10,8 +10,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
   const { id } = await params;
   let body: Record<string, unknown>;
   try {
@@ -40,8 +41,9 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission("content");
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
   const { id } = await params;
   const admin = createAdminClient();
   const { error } = await admin.from("page_sections").delete().eq("id", id);

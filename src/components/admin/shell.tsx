@@ -8,12 +8,14 @@ import { createClient } from "@/lib/supabase/client";
 import { LogoMark } from "@/components/layout/logo";
 import { Icon } from "@/components/icon";
 import { useAdminLang } from "@/components/admin/lang";
+import { NotificationsBell } from "@/components/admin/notifications-bell";
 
 interface NavItem {
   label: string;
   labelAr: string;
   href: string;
   icon: string;
+  permission: string;
 }
 interface NavGroup {
   label: string;
@@ -22,48 +24,49 @@ interface NavGroup {
 }
 
 const navGroups: NavGroup[] = [
-  { label: "Overview", labelAr: "نظرة عامة", items: [{ label: "Dashboard", labelAr: "لوحة التحكم", href: "/admin", icon: "sliders" }] },
+  { label: "Overview", labelAr: "نظرة عامة", items: [{ label: "Dashboard", labelAr: "لوحة التحكم", href: "/admin", icon: "sliders", permission: "dashboard" }] },
   {
     label: "Content",
     labelAr: "المحتوى",
     items: [
-      { label: "Pages", labelAr: "الصفحات", href: "/admin/pages", icon: "file-text" },
-      { label: "Services", labelAr: "الخدمات", href: "/admin/services", icon: "ship" },
-      { label: "Blog", labelAr: "المدونة", href: "/admin/blog", icon: "calendar" },
-      { label: "Categories", labelAr: "تصنيفات المدونة", href: "/admin/categories", icon: "layout-grid" },
-      { label: "Careers", labelAr: "الوظائف", href: "/admin/careers", icon: "briefcase" },
-      { label: "Menus", labelAr: "القوائم", href: "/admin/menus", icon: "menu" },
-      { label: "Media", labelAr: "الصور والوسائط", href: "/admin/media", icon: "package" },
-      { label: "Statistics", labelAr: "الإحصائيات", href: "/admin/statistics", icon: "bar-chart" },
-      { label: "Why Al-Izdehar", labelAr: "لماذا الازدهار", href: "/admin/why-us", icon: "award" },
-      { label: "Gallery", labelAr: "المعرض", href: "/admin/gallery", icon: "boxes" },
-      { label: "Cargo Types", labelAr: "أنواع البضائع", href: "/admin/cargo-types", icon: "container" },
+      { label: "Pages", labelAr: "الصفحات", href: "/admin/pages", icon: "file-text", permission: "content" },
+      { label: "Services", labelAr: "الخدمات", href: "/admin/services", icon: "ship", permission: "content" },
+      { label: "Blog", labelAr: "المدونة", href: "/admin/blog", icon: "calendar", permission: "content" },
+      { label: "Categories", labelAr: "تصنيفات المدونة", href: "/admin/categories", icon: "layout-grid", permission: "content" },
+      { label: "Careers", labelAr: "الوظائف", href: "/admin/careers", icon: "briefcase", permission: "content" },
+      { label: "Menus", labelAr: "القوائم", href: "/admin/menus", icon: "menu", permission: "content" },
+      { label: "Media", labelAr: "الصور والوسائط", href: "/admin/media", icon: "package", permission: "content" },
+      { label: "Statistics", labelAr: "الإحصائيات", href: "/admin/statistics", icon: "bar-chart", permission: "content" },
+      { label: "Why Al-Izdehar", labelAr: "لماذا الازدهار", href: "/admin/why-us", icon: "award", permission: "content" },
+      { label: "Gallery", labelAr: "المعرض", href: "/admin/gallery", icon: "boxes", permission: "content" },
+      { label: "Cargo Types", labelAr: "أنواع البضائع", href: "/admin/cargo-types", icon: "container", permission: "content" },
     ],
   },
   {
     label: "Leads",
     labelAr: "الطلبات والعملاء",
     items: [
-      { label: "Quote Requests", labelAr: "طلبات عرض السعر", href: "/admin/leads?type=quote", icon: "mail" },
-      { label: "Contact Requests", labelAr: "رسائل التواصل", href: "/admin/leads?type=contact", icon: "mail" },
-      { label: "Career Applications", labelAr: "طلبات الوظائف", href: "/admin/leads?type=career", icon: "briefcase" },
+      { label: "Quote Requests", labelAr: "طلبات عرض السعر", href: "/admin/leads?type=quote", icon: "mail", permission: "leads" },
+      { label: "Contact Requests", labelAr: "رسائل التواصل", href: "/admin/leads?type=contact", icon: "mail", permission: "leads" },
+      { label: "Career Applications", labelAr: "طلبات الوظائف", href: "/admin/leads?type=career", icon: "briefcase", permission: "leads" },
     ],
   },
   {
     label: "SEO & Marketing",
     labelAr: "تحسين محركات البحث والتسويق",
     items: [
-      { label: "SEO", labelAr: "SEO العام", href: "/admin/seo", icon: "search" },
-      { label: "Social Media", labelAr: "وسائل التواصل", href: "/admin/social", icon: "globe" },
-      { label: "Redirects", labelAr: "التحويلات", href: "/admin/redirects", icon: "arrow-right" },
+      { label: "SEO", labelAr: "SEO العام", href: "/admin/seo", icon: "search", permission: "seo" },
+      { label: "Social Media", labelAr: "وسائل التواصل", href: "/admin/social", icon: "globe", permission: "seo" },
+      { label: "Redirects", labelAr: "التحويلات", href: "/admin/redirects", icon: "arrow-right", permission: "seo" },
     ],
   },
   {
     label: "Settings",
     labelAr: "الإعدادات",
     items: [
-      { label: "General Settings", labelAr: "الإعدادات العامة", href: "/admin/settings", icon: "sliders" },
-      { label: "Email", labelAr: "البريد الإلكتروني", href: "/admin/email", icon: "mail" },
+      { label: "General Settings", labelAr: "الإعدادات العامة", href: "/admin/settings", icon: "sliders", permission: "settings" },
+      { label: "Email", labelAr: "البريد الإلكتروني", href: "/admin/email", icon: "mail", permission: "settings" },
+      { label: "Users & Permissions", labelAr: "المستخدمون والصلاحيات", href: "/admin/users", icon: "users", permission: "users" },
     ],
   },
 ];
@@ -71,16 +74,22 @@ const navGroups: NavGroup[] = [
 export function AdminShell({
   email,
   role,
+  permissions,
   children,
 }: {
   email: string;
   role: string;
+  permissions: string[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname() || "";
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { lang, setLang, t } = useAdminLang();
+
+  const groups = navGroups
+    .map((g) => ({ ...g, items: g.items.filter((i) => permissions.includes(i.permission)) }))
+    .filter((g) => g.items.length > 0);
 
   async function signOut() {
     const supabase = createClient();
@@ -99,7 +108,7 @@ export function AdminShell({
         </div>
       </div>
       <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-6">
-        {navGroups.map((group) => (
+        {groups.map((group) => (
           <div key={group.label}>
             <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-white/40">
               {t(group.label, group.labelAr)}
@@ -167,6 +176,7 @@ export function AdminShell({
             <span className="text-sm font-semibold text-brand-900">Al-Izdehar Logistics</span>
           </div>
           <div className="flex items-center gap-3">
+            {permissions.includes("leads") ? <NotificationsBell /> : null}
             <button
               type="button"
               onClick={() => setLang(lang === "en" ? "ar" : "en")}

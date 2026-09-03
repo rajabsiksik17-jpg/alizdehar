@@ -9,7 +9,7 @@ export default async function AdminLeadsPage({
 }: {
   searchParams: Promise<{ type?: string }>;
 }) {
-  await requireAdmin();
+  await requireAdmin("leads");
   const sp = await searchParams;
   const type = sp.type;
 

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { requireApiPermission } from "@/lib/admin-auth";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
-  const session = await getAdminUser();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = await requireApiPermission("leads");
+  if (denied) return denied;
 
   let body: { to?: string; subject?: string; message?: string };
   try {

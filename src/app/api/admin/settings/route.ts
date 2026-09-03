@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { getAdminUser, requireApiPermission } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 function pick(value: unknown): string | null {
@@ -19,8 +19,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getAdminUser();
-  if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  const denied = await requireApiPermission("settings");
+  if (denied) return denied;
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
       { success: false, error: "Supabase is not configured." },
@@ -61,6 +61,7 @@ export async function POST(request: Request) {
       ar: String(body.working_hours_ar ?? ""),
     };
   }
+  if (body.map_embed !== undefined) row.map_embed = pick(body.map_embed);
   if (body.ga_measurement_id !== undefined) row.ga_measurement_id = pick(body.ga_measurement_id);
   if (body.gtm_id !== undefined) row.gtm_id = pick(body.gtm_id);
   if (body.logo !== undefined) row.logo = pick(body.logo);

@@ -8,7 +8,7 @@ export default async function PageEditPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  await requireAdmin();
+  await requireAdmin("content");
   const { slug } = await params;
 
   // Verify the page exists (seed fallback) before rendering the editor.

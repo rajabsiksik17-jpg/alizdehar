@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { getAdminUser, requireApiPermission } from "@/lib/admin-auth";
+import { permissionForTable } from "@/lib/admin-permissions";
 import { getEntity, adminEntityTableSet } from "@/lib/admin-registry";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
@@ -37,8 +38,9 @@ export async function POST(
   if (!adminEntityTableSet.has(table)) {
     return NextResponse.json({ error: "Unknown table" }, { status: 400 });
   }
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission(permissionForTable(table));
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
 
   let body: Record<string, unknown>;
   try {
@@ -71,8 +73,9 @@ export async function PATCH(
   if (!adminEntityTableSet.has(table)) {
     return NextResponse.json({ error: "Unknown table" }, { status: 400 });
   }
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission(permissionForTable(table));
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
 
   let body: Record<string, unknown>;
   try {
@@ -103,8 +106,9 @@ export async function DELETE(
   if (!adminEntityTableSet.has(table)) {
     return NextResponse.json({ error: "Unknown table" }, { status: 400 });
   }
-  const session = await getAdminUser();
-  if (!session || !isSupabaseConfigured()) return unauthorized();
+  const denied = await requireApiPermission(permissionForTable(table));
+  if (denied) return denied;
+  if (!isSupabaseConfigured()) return unauthorized();
 
   let body: Record<string, unknown>;
   try {

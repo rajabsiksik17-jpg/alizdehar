@@ -44,6 +44,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
     address_ar: settings.address?.ar ?? "",
     working_hours_en: settings.working_hours?.en ?? "",
     working_hours_ar: settings.working_hours?.ar ?? "",
+    map_embed: settings.map_embed ?? "",
     ga_measurement_id: settings.ga_measurement_id ?? "",
     gtm_id: settings.gtm_id ?? "",
     logo: settings.logo ?? "",
@@ -109,6 +110,9 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <Field label="العنوان (AR)" value={form.address_ar} onChange={set("address_ar")} dir="rtl" />
           <Field label="Working hours (EN)" value={form.working_hours_en} onChange={set("working_hours_en")} />
           <Field label="ساعات العمل (AR)" value={form.working_hours_ar} onChange={set("working_hours_ar")} dir="rtl" />
+        </div>
+        <div className="mt-4">
+          <Field label="Map URL (Google Maps embed link)" value={form.map_embed} onChange={set("map_embed")} />
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icon";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { useAdminLang } from "@/components/admin/lang";
 
 type L = { en: string; ar: string };
@@ -54,6 +55,9 @@ export function BlogEditor({
     category: (initial?.category as string) ?? "",
     tags: Array.isArray(initial?.tags) ? (initial.tags as string[]).join(", ") : "",
     cover_image: (initial?.cover_image as string) ?? "",
+    seo_title: ((initial?.seo as Record<string, unknown>)?.seo_title as L) ?? { en: "", ar: "" },
+    seo_description: ((initial?.seo as Record<string, unknown>)?.seo_description as L) ?? { en: "", ar: "" },
+    focus_keyword: ((initial?.seo as Record<string, unknown>)?.focus_keyword as L) ?? { en: "", ar: "" },
   }));
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [saving, setSaving] = useState(false);
@@ -88,6 +92,11 @@ export function BlogEditor({
       category: form.category || null,
       tags: form.tags ? form.tags.split(",").map((s) => s.trim()).filter(Boolean) : [],
       cover_image: form.cover_image || null,
+      seo: {
+        seo_title: form.seo_title,
+        seo_description: form.seo_description,
+        focus_keyword: form.focus_keyword,
+      },
     };
     try {
       const url = isNew ? "/api/admin/blog" : `/api/admin/blog/${form.slug}`;
@@ -154,10 +163,28 @@ export function BlogEditor({
         <h2 className="text-base font-bold text-brand-900">{t("Content", "المحتوى")}</h2>
         <div className="mt-4 space-y-3">
           <Localized label="Excerpt" labelAr="المقتطف" value={form.excerpt} onChange={(v) => set("excerpt", v)} textarea />
-          <Localized label="Content" labelAr="المحتوى الكامل" value={form.content} onChange={(v) => set("content", v)} textarea />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div>
+              <label className={lbl}>{t("Content", "المحتوى")} (EN)</label>
+              <RichTextEditor value={form.content.en} onChange={(en) => set("content", { ...form.content, en })} />
+            </div>
+            <div>
+              <label className={lbl}>{t("Content", "المحتوى")} (AR)</label>
+              <RichTextEditor value={form.content.ar} onChange={(ar) => set("content", { ...form.content, ar })} dir="rtl" />
+            </div>
+          </div>
           <p className="text-xs text-ink-muted">
-            {t("Supports headings (##), bold (**text**), lists (- item).", "يدعم العناوين (##) والقوائم (- عنصر).")}
+            {t("Supports headings (##), bold (**text**), italic (*text*), lists (- item), links [text](url).", "يدعم العناوين (##) والنص الغامق (**نص**) والقوائم (- عنصر) والروابط [نص](رابط).")}
           </p>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
+        <h2 className="text-base font-bold text-brand-900">SEO</h2>
+        <div className="mt-4 space-y-3">
+          <Localized label="SEO title" labelAr="عنوان SEO" value={form.seo_title} onChange={(v) => set("seo_title", v)} />
+          <Localized label="Meta description" labelAr="وصف SEO" value={form.seo_description} onChange={(v) => set("seo_description", v)} textarea />
+          <Localized label="Focus keyword" labelAr="الكلمة المفتاحية" value={form.focus_keyword} onChange={(v) => set("focus_keyword", v)} />
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin-auth";
+import { permissionForModuleSlug } from "@/lib/admin-permissions";
 import { getEntity, adminEntities } from "@/lib/admin-registry";
 import { CrudManager } from "@/components/admin/crud-manager";
 import { MediaLibrary } from "@/components/admin/media-library";
@@ -26,10 +27,12 @@ export default async function AdminModulePage({
 }: {
   params: Promise<{ module: string[] }>;
 }) {
-  await requireAdmin();
   const { module } = await params;
   const slug = module[0] ?? "";
   const table = slugToTable[slug];
+
+  const perm = permissionForModuleSlug(slug) ?? (slug === "media" || table ? "content" : null);
+  await requireAdmin(perm ?? undefined);
 
   if (slug === "media") {
     return (

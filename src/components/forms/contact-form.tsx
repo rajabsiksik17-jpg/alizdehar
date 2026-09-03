@@ -4,11 +4,22 @@ import { useState } from "react";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/config";
 import { PhoneInput, type PhoneValue } from "@/components/phone-input";
+import { SearchSelect } from "@/components/search-select";
 
 const input =
   "w-full rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-muted/60 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
-export function ContactForm({ locale }: { locale: Locale }) {
+function L(locale: Locale, en: string, ar: string) {
+  return locale === "ar" ? ar : en;
+}
+
+export function ContactForm({
+  locale,
+  services,
+}: {
+  locale: Locale;
+  services: { slug: string; name: string }[];
+}) {
   const dict = getDictionary(locale);
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [phone, setPhone] = useState<PhoneValue>({
@@ -18,6 +29,7 @@ export function ContactForm({ locale }: { locale: Locale }) {
     valid: false,
     dialCode: "+962",
   });
+  const [service, setService] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,6 +38,7 @@ export function ContactForm({ locale }: { locale: Locale }) {
     const data = Object.fromEntries(new FormData(form).entries());
     const payload = {
       ...data,
+      subject: service,
       phone: phone.number,
       phone_country: phone.country,
       phone_dial_code: phone.dialCode,
@@ -39,6 +52,7 @@ export function ContactForm({ locale }: { locale: Locale }) {
       });
       if (!res.ok) throw new Error("failed");
       form.reset();
+      setService("");
       setState("done");
     } catch {
       setState("error");
@@ -60,29 +74,60 @@ export function ContactForm({ locale }: { locale: Locale }) {
           <label htmlFor="cf-name" className="mb-1.5 block text-sm font-semibold text-brand-900">
             {dict.quote.name}
           </label>
-          <input id="cf-name" name="name" required className={input} />
+          <input
+            id="cf-name"
+            name="name"
+            required
+            placeholder={L(locale, "Enter your full name", "أدخل اسمك الكامل")}
+            className={input}
+          />
         </div>
         <div>
           <label htmlFor="cf-email" className="mb-1.5 block text-sm font-semibold text-brand-900">
             {dict.quote.email}
           </label>
-          <input id="cf-email" name="email" type="email" required className={input} />
+          <input
+            id="cf-email"
+            name="email"
+            type="email"
+            required
+            placeholder={L(locale, "you@example.com", "you@example.com")}
+            className={input}
+          />
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <PhoneInput id="cf-phone" label={dict.quote.phone} locale={locale} onChange={setPhone} />
+        <PhoneInput
+          id="cf-phone"
+          label={dict.quote.phone}
+          locale={locale}
+          onChange={setPhone}
+          placeholder={L(locale, "Your phone number", "رقم هاتفك")}
+        />
         <div>
-          <label htmlFor="cf-subject" className="mb-1.5 block text-sm font-semibold text-brand-900">
-            {dict.quote.service}
-          </label>
-          <input id="cf-subject" name="subject" className={input} />
+          <span className="mb-1.5 block text-sm font-semibold text-brand-900">{dict.quote.service}</span>
+          <SearchSelect
+            id="cf-service"
+            locale={locale}
+            options={services.map((s) => ({ value: s.slug, label: s.name }))}
+            value={service}
+            onChange={setService}
+            placeholder={L(locale, "Select a service", "اختر خدمة")}
+          />
         </div>
       </div>
       <div>
         <label htmlFor="cf-message" className="mb-1.5 block text-sm font-semibold text-brand-900">
           {dict.quote.message}
         </label>
-        <textarea id="cf-message" name="message" rows={5} required className={input} />
+        <textarea
+          id="cf-message"
+          name="message"
+          rows={5}
+          required
+          placeholder={L(locale, "Write the details of your inquiry…", "اكتب تفاصيل استفسارك…")}
+          className={input}
+        />
       </div>
       <button
         type="submit"

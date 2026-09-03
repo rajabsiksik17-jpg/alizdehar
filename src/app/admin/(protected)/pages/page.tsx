@@ -16,7 +16,7 @@ const knownPages = [
 ];
 
 export default async function AdminPagesPage() {
-  await requireAdmin();
+  await requireAdmin("content");
 
   const bySlug = new Map(knownPages.map((p) => [p.slug, p]));
 
