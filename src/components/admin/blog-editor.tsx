@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icon";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { slugify } from "@/lib/utils";
 import { useAdminLang } from "@/components/admin/lang";
 
 type L = { en: string; ar: string };
@@ -51,7 +52,7 @@ export function BlogEditor({
     excerpt: (initial?.excerpt as L) ?? { en: "", ar: "" },
     content: (initial?.content as L) ?? { en: "", ar: "" },
     author: (initial?.author as L) ?? { en: "", ar: "" },
-    status: (initial?.status as string) ?? "draft",
+    status: (initial?.status as string) ?? "published",
     category: (initial?.category as string) ?? "",
     tags: Array.isArray(initial?.tags) ? (initial.tags as string[]).join(", ") : "",
     cover_image: (initial?.cover_image as string) ?? "",
@@ -62,6 +63,7 @@ export function BlogEditor({
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [slugTouched, setSlugTouched] = useState(!!(initial?.slug as string));
 
   useEffect(() => {
     (async () => {
@@ -84,7 +86,7 @@ export function BlogEditor({
     setMsg(null);
     const payload = {
       title: form.title,
-      slug: form.slug,
+      slug: form.slug.trim() || slugify(form.title.en) || slugify(form.title.ar),
       excerpt: form.excerpt,
       content: form.content,
       author: form.author,
@@ -123,11 +125,27 @@ export function BlogEditor({
       <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
         <h2 className="text-base font-bold text-brand-900">{t("Basic information", "معلومات أساسية")}</h2>
         <div className="mt-4 space-y-3">
-          <Localized label="Title" labelAr="العنوان" value={form.title} onChange={(v) => set("title", v)} />
+          <Localized
+            label="Title"
+            labelAr="العنوان"
+            value={form.title}
+            onChange={(v) => {
+              set("title", v);
+              if (!slugTouched) set("slug", slugify(v.en));
+            }}
+          />
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Slug</label>
-              <input value={form.slug} onChange={(e) => set("slug", e.target.value)} className={input} />
+              <input
+                value={form.slug}
+                onChange={(e) => {
+                  set("slug", e.target.value);
+                  setSlugTouched(true);
+                }}
+                className={input}
+                placeholder="auto-generated-from-title"
+              />
             </div>
             <div>
               <label className={lbl}>{t("Status", "الحالة")}</label>

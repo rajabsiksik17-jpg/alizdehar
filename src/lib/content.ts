@@ -243,6 +243,44 @@ export async function getGallery(): Promise<GalleryItem[]> {
 
 /* ── Blog ─────────────────────────────────────────────────── */
 
+function toLocalized(value: unknown): LocalizedText {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const v = value as { en?: string; ar?: string };
+    return { en: typeof v.en === "string" ? v.en : "", ar: typeof v.ar === "string" ? v.ar : "" };
+  }
+  const s = typeof value === "string" ? value : "";
+  return { en: s, ar: s };
+}
+
+function normalizeBlogPost(row: Record<string, unknown>): BlogPost {
+  const seo = (row.seo && typeof row.seo === "object" ? row.seo : {}) as Record<string, unknown>;
+  return {
+    id: String(row.id ?? ""),
+    slug: String(row.slug ?? ""),
+    title: toLocalized(row.title),
+    excerpt: toLocalized(row.excerpt),
+    content: toLocalized(row.content),
+    cover_image: typeof row.cover_image === "string" ? row.cover_image : null,
+    category: typeof row.category === "string" ? row.category : null,
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    author: row.author ? toLocalized(row.author) : null,
+    published_at: typeof row.published_at === "string" ? row.published_at : null,
+    reading_time: typeof row.reading_time === "number" ? row.reading_time : 1,
+    status: row.status === "draft" ? "draft" : "published",
+    seo: {
+      seo_title: seo.seo_title ? toLocalized(seo.seo_title) : null,
+      seo_description: seo.seo_description ? toLocalized(seo.seo_description) : null,
+      focus_keyword: seo.focus_keyword ? toLocalized(seo.focus_keyword) : null,
+      canonical_url: typeof seo.canonical_url === "string" ? seo.canonical_url : null,
+      noindex: Boolean(seo.noindex),
+      og_title: seo.og_title ? toLocalized(seo.og_title) : null,
+      og_description: seo.og_description ? toLocalized(seo.og_description) : null,
+      og_image: typeof seo.og_image === "string" ? seo.og_image : null,
+      schema_type: typeof seo.schema_type === "string" ? seo.schema_type : null,
+    },
+  };
+}
+
 export async function getBlogPosts(): Promise<BlogPost[]> {
   const rows = await fromSupabase(async (c) => {
     const { data, error } = await c
@@ -251,7 +289,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       .eq("status", "published")
       .order("published_at", { ascending: false });
     if (error || !data?.length) return null;
-    return data as BlogPost[];
+    return (data as Record<string, unknown>[]).map(normalizeBlogPost).filter((p) => p.slug);
   });
   return rows ?? seedBlogPosts;
 }
@@ -265,14 +303,14 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
       .eq("status", "published")
       .maybeSingle();
     if (error || !data) return null;
-    return data as BlogPost;
+    return normalizeBlogPost(data as Record<string, unknown>);
   });
   return row ?? seedBlogPosts.find((p) => p.slug === slug) ?? null;
 }
 
 export async function getBlogSlugs(): Promise<string[]> {
   const posts = await getBlogPosts();
-  return posts.map((p) => p.slug);
+  return posts.map((p) => p.slug).filter(Boolean);
 }
 
 /* ── Careers ──────────────────────────────────────────────── */
