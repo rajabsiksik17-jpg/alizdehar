@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { pick, getDictionary } from "@/lib/i18n/config";
 import { href } from "@/lib/site";
 import type { MenuItem, Service, SiteSettings } from "@/types";
-import { LogoMark } from "@/components/layout/logo";
+import { LogoImage } from "@/components/layout/logo";
 import { NewsletterForm } from "@/components/layout/newsletter-form";
 import { BrandIcon, Icon } from "@/components/icon";
 
@@ -30,7 +30,7 @@ export function Footer({
           {/* Brand */}
           <div className="lg:col-span-4">
             <div className="flex items-center gap-3">
-              <LogoMark className="h-11 w-11" />
+              <LogoImage src={settings.logo} alt={pick(settings.site_name, locale)} className="h-11 w-11 shrink-0 object-contain" />
               <div className="leading-tight">
                 <p className="text-lg font-extrabold">{pick(settings.site_name, locale)}</p>
                 <p className="mt-0.5 text-xs text-accent-400">{pick(settings.tagline, locale)}</p>

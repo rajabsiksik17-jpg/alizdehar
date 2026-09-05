@@ -1,19 +1,24 @@
 import type { MetadataRoute } from "next";
+import { getSettings } from "@/lib/content";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const settings = await getSettings();
+  const icon = settings.favicon || "/icon.svg";
+  const iconType = settings.favicon ? undefined : "image/svg+xml";
+
   return {
-    name: "Al-Izdehar Logistics",
+    name: settings.site_name.en,
     short_name: "Al-Izdehar",
-    description: "Integrated shipping and logistics solutions since 1982.",
+    description: settings.site_description.en,
     start_url: "/",
     display: "standalone",
     background_color: "#081c33",
     theme_color: "#0f2a48",
     icons: [
       {
-        src: "/icon.svg",
+        src: icon,
         sizes: "any",
-        type: "image/svg+xml",
+        type: iconType,
       },
     ],
   };

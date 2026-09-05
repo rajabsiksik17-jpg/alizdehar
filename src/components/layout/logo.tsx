@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Locale } from "@/lib/i18n/config";
 import { pick } from "@/lib/i18n/config";
 import { LocaleLink } from "@/components/link";
@@ -12,6 +13,30 @@ export function LogoMark({ className }: { className?: string }) {
       <circle cx="29" cy="20" r="2.2" fill="#fff" />
     </svg>
   );
+}
+
+/** A single logo graphical mark: custom image when set, else the placeholder mark. */
+export function LogoImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string | null | undefined;
+  alt?: string;
+  className?: string;
+}) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={alt || "Logo"}
+        width={80}
+        height={80}
+        className={className ?? "h-10 w-10 shrink-0 object-contain"}
+      />
+    );
+  }
+  return <LogoMark className={className ?? "h-10 w-10 shrink-0"} />;
 }
 
 export function Logo({
@@ -30,7 +55,11 @@ export function Logo({
       className={`group flex items-center gap-3 ${className ?? ""}`}
       aria-label={pick(settings.site_name, locale)}
     >
-      <LogoMark className="h-10 w-10 shrink-0 transition-transform duration-300 group-hover:scale-105" />
+      <LogoImage
+        src={settings.logo}
+        alt={pick(settings.site_name, locale)}
+        className="h-10 w-10 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
+      />
       <span className="flex flex-col leading-none">
         <span className="text-lg font-extrabold tracking-tight text-brand-900">
           {pick(settings.site_name, locale)}
