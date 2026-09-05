@@ -36,6 +36,7 @@ const sectionTypes = [
   { type: "timeline", label: "Timeline", ar: "خط زمني" },
   { type: "faq", label: "FAQ", ar: "أسئلة شائعة" },
   { type: "cta", label: "CTA", ar: "دعوة لاتخاذ إجراء" },
+  { type: "mission_vision", label: "Mission & Vision", ar: "الرسالة والرؤية" },
   { type: "testimonials", label: "Testimonials", ar: "آراء العملاء" },
   { type: "gallery", label: "Gallery", ar: "معرض" },
   { type: "logos", label: "Logos", ar: "شعارات" },
@@ -49,6 +50,13 @@ const lbl = "mb-1 block text-xs font-semibold text-brand-900";
 function typeLabel(type: string, t: (en: string, ar: string) => string) {
   const found = sectionTypes.find((s) => s.type === type);
   return found ? t(found.label, found.ar) : type;
+}
+
+/** Human name for a section: use its title first, else the type label. */
+function sectionName(s: Section, lang: "en" | "ar", t: (en: string, ar: string) => string) {
+  const title = (lang === "ar" ? s.title?.ar : s.title?.en) || (lang === "ar" ? s.title?.en : s.title?.ar);
+  if (title) return title;
+  return typeLabel(s.type, t);
 }
 
 function Localized({ label, labelAr, value, onChange, textarea }: { label: string; labelAr: string; value: L; onChange: (v: L) => void; textarea?: boolean }) {
@@ -75,7 +83,7 @@ function Localized({ label, labelAr, value, onChange, textarea }: { label: strin
 }
 
 export function PageEditor({ pageSlug }: { pageSlug: string }) {
-  const { t } = useAdminLang();
+  const { t, lang } = useAdminLang();
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -191,8 +199,8 @@ export function PageEditor({ pageSlug }: { pageSlug: string }) {
                     <Icon name="layers" className="h-4 w-4" />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-brand-900">{typeLabel(s.type, t)}</p>
-                    <p className="truncate text-xs text-ink-muted">{s.title?.en || s.title?.ar || t("Untitled section", "قسم بدون عنوان")}</p>
+                    <p className="truncate font-semibold text-brand-900">{sectionName(s, lang, t)}</p>
+                    <p className="truncate text-xs text-ink-muted">{typeLabel(s.type, t)}</p>
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">

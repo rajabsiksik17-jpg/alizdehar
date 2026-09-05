@@ -149,6 +149,7 @@ export type SectionType =
   | "gallery"
   | "cta"
   | "rich_text"
+  | "mission_vision"
   | "logos";
 
 export interface PageSection {
@@ -216,6 +217,8 @@ export interface Career {
   status: Status;
   /** Demo/sample placeholder flag — true until real vacancies are added. */
   demo?: boolean;
+  /** Linked application form id (falls back to the default form). */
+  application_form_id?: string | null;
 }
 
 /* ── Social proof ─────────────────────────────────────────── */

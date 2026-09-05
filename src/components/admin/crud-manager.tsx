@@ -5,6 +5,7 @@ import type { AdminEntity, AdminField } from "@/lib/admin-registry";
 import { Icon } from "@/components/icon";
 import { IconPicker } from "@/components/admin/icon-picker";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { FormPicker } from "@/components/admin/form-picker";
 import { useAdminLang } from "@/components/admin/lang";
 
 type Row = Record<string, unknown>;
@@ -291,6 +292,13 @@ function EditModal({
                       </option>
                     ))}
                   </select>
+                </div>
+              );
+            }
+            if (f.type === "form") {
+              return (
+                <div key={f.name}>
+                  <FormPicker label={fl(f)} value={String(form[f.name] ?? "")} onChange={(v) => set(f.name, v || null)} />
                 </div>
               );
             }

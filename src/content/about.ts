@@ -105,41 +105,35 @@ const aboutSections: PageSection[] = [
     sort_order: 4,
   },
   {
-    id: "about-mission",
-    type: "rich_text",
-    title: localize("Our Mission", "رسالتنا"),
-    subtitle: localize(
-      "Our mission is to provide comprehensive, flexible, and cost-effective logistics solutions tailored to meet the unique needs and requirements of every client.",
-      "رسالتنا هي تقديم حلول لوجستية شاملة ومرنة وفعالة من حيث التكلفة مصممة لتلبية الاحتياجات والمتطلبات الفريدة لكل عميل.",
-    ),
-    body: localize(
-      "We believe that our clients are more than customers — they are our partners. We treat every business, shipment, and challenge as if it were our own, ensuring the highest levels of care, safety, reliability, and efficiency throughout the entire logistics journey.\n\nFrom the moment your shipment begins its journey until it reaches its final destination, Al-Izdehar Logistics is committed to delivering a seamless experience, competitive solutions, and dependable service.",
-      "نؤمن بأن عملاءنا أكثر من مجرد زبائن — فهم شركاؤنا. نتعامل مع كل عمل وشحنة وتحدٍ كما لو كانت ملكاً لنا، لضمان أعلى مستويات الرعاية والأمان والموثوقية والكفاءة طوال الرحلة اللوجستية.\n\nمن لحظة بدء رحلة شحنتك حتى وصولها إلى وجهتها النهائية، تلتزم الإزدهار للوجستيات بتقديم تجربة سلسة وحلول تنافسية وخدمة موثوقة.",
-    ),
+    id: "about-mission-vision",
+    type: "mission_vision",
+    title: null,
+    subtitle: null,
+    body: null,
     image: null,
-    items: [],
-    settings: { align: "center" },
+    items: [
+      {
+        id: "mv-mission",
+        icon: "crosshair",
+        title: localize("Our Mission", "رسالتنا"),
+        description: localize(
+          "To provide comprehensive, flexible, and cost-effective logistics solutions tailored to meet the unique needs and requirements of every client. We treat every business, shipment, and challenge as if it were our own, ensuring the highest levels of care, safety, reliability, and efficiency throughout the entire logistics journey.",
+          "تقديم حلول لوجستية شاملة ومرنة وفعالة من حيث التكلفة مصممة لتلبية الاحتياجات والمتطلبات الفريدة لكل عميل. نتعامل مع كل عمل وشحنة وتحدٍ كما لو كانت ملكاً لنا، لضمان أعلى مستويات الرعاية والأمان والموثوقية والكفاءة طوال الرحلة اللوجستية.",
+        ),
+      },
+      {
+        id: "mv-vision",
+        icon: "eye",
+        title: localize("Our Vision", "رؤيتنا"),
+        description: localize(
+          "To be the most trusted logistics and customs clearance partner in the region — recognized for reliability, professionalism and genuine care for every client and every shipment.",
+          "أن نكون الشريك اللوجستي والتخليص الجمركي الأكثر موثوقية في المنطقة — معروفين بالموثوقية والاحترافية والاهتمام الحقيقي بكل عميل وكل شحنة.",
+        ),
+      },
+    ],
+    settings: {},
     hidden: false,
     sort_order: 5,
-  },
-  {
-    id: "about-vision",
-    type: "rich_text",
-    title: localize("Our Vision", "رؤيتنا"),
-    subtitle: localize(
-      "A clear direction for the future of Al-Izdehar Logistics.",
-      "اتجاه واضح لمستقبل الإزدهار للوجستيات.",
-    ),
-    // DEMO/sample content — not present in the source document. Editable from the CMS.
-    body: localize(
-      "Our vision is to be the most trusted logistics and customs clearance partner in the region — recognized for reliability, professionalism and genuine care for every client and every shipment.",
-      "رؤيتنا أن نكون الشريك اللوجستي والتخليص الجمركي الأكثر موثوقية في المنطقة — معروفين بالموثوقية والاحترافية والاهتمام الحقيقي بكل عميل وكل شحنة.",
-    ),
-    image: null,
-    items: [],
-    settings: { align: "center", demo: true },
-    hidden: false,
-    sort_order: 6,
   },
   {
     id: "about-values",

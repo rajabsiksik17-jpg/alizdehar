@@ -10,6 +10,7 @@ export type FieldType =
   | "icon"
   | "image"
   | "select"
+  | "form"
   | "json";
 
 export interface AdminField {
@@ -206,6 +207,7 @@ export const adminEntities: AdminEntity[] = [
       { name: "location", label: "Location", labelAr: "الموقع", type: "localized" },
       { name: "employment_type", label: "Employment type", labelAr: "نوع الوظيفة", type: "localized" },
       { name: "status", label: "Status", labelAr: "الحالة", type: "select", options: [{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }] },
+      { name: "application_form_id", label: "Application form", labelAr: "نموذج التقديم", type: "form" },
       { name: "description", label: "Description", labelAr: "الوصف", type: "localized-textarea" },
       { name: "responsibilities", label: "Responsibilities", labelAr: "المسؤوليات", type: "localized-textarea" },
       { name: "requirements", label: "Requirements", labelAr: "المتطلبات", type: "localized-textarea" },

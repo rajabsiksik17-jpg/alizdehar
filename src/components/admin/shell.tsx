@@ -34,6 +34,7 @@ const navGroups: NavGroup[] = [
       { label: "Blog", labelAr: "المدونة", href: "/admin/blog", icon: "calendar", permission: "content" },
       { label: "Categories", labelAr: "تصنيفات المدونة", href: "/admin/categories", icon: "layout-grid", permission: "content" },
       { label: "Careers", labelAr: "الوظائف", href: "/admin/careers", icon: "briefcase", permission: "content" },
+      { label: "Job Forms", labelAr: "نماذج التقديم", href: "/admin/forms", icon: "clipboard-list", permission: "content" },
       { label: "Menus", labelAr: "القوائم", href: "/admin/menus", icon: "menu", permission: "content" },
       { label: "Media", labelAr: "الصور والوسائط", href: "/admin/media", icon: "package", permission: "content" },
       { label: "Statistics", labelAr: "الإحصائيات", href: "/admin/statistics", icon: "bar-chart", permission: "content" },

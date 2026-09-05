@@ -169,6 +169,8 @@ export function SectionRenderer({
         </Section>
       );
     }
+    case "mission_vision":
+      return <MissionVision section={section} locale={locale} />;
     default:
       return null;
   }
@@ -356,8 +358,44 @@ function Features({
   );
 }
 
-function Process({ section, locale }: { section: PageSection; locale: Locale }) {
+function MissionVision({ section, locale }: { section: PageSection; locale: Locale }) {
   const items = section.items as {
+    id: string;
+    icon?: string;
+    title?: { en: string; ar: string };
+    description?: { en: string; ar: string };
+  }[];
+
+  return (
+    <Section bg="dark">
+      <div className="relative grid gap-6 lg:grid-cols-2">
+        {items.map((item, i) => (
+          <Reveal key={item.id} delay={i * 100}>
+            <article className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent-400/40 hover:bg-white/[0.07] md:p-10">
+              <div className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-accent-500/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true" />
+              <div className="relative">
+                <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-500 text-brand-950 shadow-lift">
+                  <Icon name={item.icon ?? "crosshair"} className="h-7 w-7" />
+                </span>
+                <p className="mt-6 text-xs font-bold uppercase tracking-[0.25em] text-accent-400">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-2 text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+                  {pick(item.title, locale)}
+                </h3>
+                <p className="mt-4 leading-relaxed text-white/65">
+                  {pick(item.description, locale)}
+                </p>
+              </div>
+            </article>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function Process({ section, locale }: { section: PageSection; locale: Locale }) {  const items = section.items as {
     id: string;
     label?: { en: string; ar: string };
     description?: { en: string; ar: string };

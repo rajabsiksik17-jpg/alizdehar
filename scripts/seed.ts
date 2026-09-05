@@ -12,6 +12,7 @@ import { seedServices } from "@/content/services";
 import { homePage, seedWhyUs, seedStatistics } from "@/content/home";
 import { aboutPage } from "@/content/about";
 import { seedCareers, seedCargoTypes } from "@/content/misc";
+import { DEFAULT_APPLICATION_FORM } from "@/lib/job-forms";
 
 function loadEnv() {
   const load = (process as unknown as { loadEnvFile?: (p: string) => void }).loadEnvFile;
@@ -151,6 +152,44 @@ async function main() {
     seedCargoTypes.map((label, i) => ({ label, sort_order: i + 1 })),
   );
   check(`cargo_types (${seedCargoTypes.length})`, cargoErr);
+
+  // 7. Default job application form (if not already present).
+  const { data: existingDefault } = await admin
+    .from("forms")
+    .select("id")
+    .eq("slug", DEFAULT_APPLICATION_FORM.slug)
+    .maybeSingle();
+  if (!existingDefault) {
+    const { data: formRow, error: formErr } = await admin
+      .from("forms")
+      .insert({
+        slug: DEFAULT_APPLICATION_FORM.slug,
+        name: DEFAULT_APPLICATION_FORM.name,
+        description: DEFAULT_APPLICATION_FORM.description,
+        is_default: true,
+        entity: "application",
+      })
+      .select("id")
+      .single();
+    check("default application form", formErr);
+    if (formRow) {
+      const fieldRows = DEFAULT_APPLICATION_FORM.fields.map((f, i) => ({
+        form_id: formRow.id,
+        name: f.name,
+        type: f.type,
+        label: f.label,
+        placeholder: f.placeholder ?? null,
+        help_text: f.help_text ?? null,
+        required: f.required,
+        options: f.options ?? [],
+        sort_order: i + 1,
+      }));
+      const { error: fieldsErr } = await admin.from("form_fields").insert(fieldRows);
+      check(`default form fields (${fieldRows.length})`, fieldsErr);
+    }
+  } else {
+    console.log("✓ default application form (already exists)");
+  }
 
   console.log("\nSeed complete. The public site will now read from Supabase.");
 }

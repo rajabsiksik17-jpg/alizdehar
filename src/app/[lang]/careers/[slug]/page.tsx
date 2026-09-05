@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, pick, getDictionary } from "@/lib/i18n/config";
-import { getCareerBySlug, getCareerSlugs } from "@/lib/content";
+import { getCareerBySlug, getCareerSlugs, getCareerForm } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/sections";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -37,6 +37,8 @@ export default async function CareerDetailPage({
 
   const job = await getCareerBySlug(slug);
   if (!job) notFound();
+
+  const form = await getCareerForm(job.application_form_id);
 
   const dict = getDictionary(lang);
   const title = pick(job.title, lang);
@@ -88,8 +90,8 @@ export default async function CareerDetailPage({
       />
 
       <Section bg="muted">
-        <div className="grid gap-10 lg:grid-cols-3 lg:items-start">
-          <div className="space-y-8 lg:col-span-2">
+        <div className="grid gap-10 lg:grid-cols-5 lg:items-start">
+          <div className="space-y-8 lg:col-span-3">
             <Reveal>
               <h2 className="text-xl font-bold text-brand-900">
                 {pick({ en: "About the role", ar: "عن الوظيفة" }, lang)}
@@ -144,13 +146,13 @@ export default async function CareerDetailPage({
             ) : null}
           </div>
 
-          <Reveal delay={100} className="lg:sticky lg:top-28">
-            <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
+          <Reveal delay={100} className="lg:col-span-2">
+            <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft lg:p-8">
               <h2 className="text-lg font-bold text-brand-900">
                 {pick({ en: "Apply for this position", ar: "قدّم لهذه الوظيفة" }, lang)}
               </h2>
               <div className="mt-5">
-                <CareerApplicationForm locale={lang} position={title} />
+                <CareerApplicationForm locale={lang} position={title} form={form} />
               </div>
             </div>
           </Reveal>

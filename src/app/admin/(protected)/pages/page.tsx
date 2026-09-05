@@ -6,11 +6,6 @@ import { Icon } from "@/components/icon";
 const knownPages = [
   { slug: "home", title: "Home", status: "published" },
   { slug: "about", title: "About Us", status: "published" },
-  { slug: "services", title: "Services", status: "published" },
-  { slug: "careers", title: "Careers", status: "published" },
-  { slug: "contact", title: "Contact", status: "published" },
-  { slug: "quote", title: "Request a Quote", status: "published" },
-  { slug: "blog", title: "Blog", status: "published" },
   { slug: "privacy", title: "Privacy Policy", status: "published" },
   { slug: "terms", title: "Terms & Conditions", status: "published" },
 ];

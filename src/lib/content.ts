@@ -19,6 +19,7 @@ import { seedSettings, seedMenu } from "@/content/settings";
 import { seedServices } from "@/content/services";
 import { homePage, seedWhyUs, seedStatistics } from "@/content/home";
 import { aboutPage } from "@/content/about";
+import { privacyPage, termsPage } from "@/content/legal";
 import {
   seedTestimonials,
   seedClients,
@@ -27,6 +28,7 @@ import {
   seedGallery,
   seedCargoTypes,
 } from "@/content/misc";
+import { DEFAULT_APPLICATION_FORM, type FormDef, type FormFieldDef } from "@/lib/job-forms";
 
 function createReadonlyClient() {
   return createClient(
@@ -149,6 +151,8 @@ export async function getServiceSlugs(): Promise<string[]> {
 const seedPages: Record<string, Page> = {
   home: homePage,
   about: aboutPage,
+  privacy: privacyPage,
+  terms: termsPage,
 };
 
 export async function getPage(slug: string): Promise<Page | null> {
@@ -345,6 +349,57 @@ export async function getCareerBySlug(slug: string): Promise<Career | null> {
 export async function getCareerSlugs(): Promise<string[]> {
   const careers = await getCareers();
   return careers.map((j) => j.slug);
+}
+
+/* ── Job application forms ───────────────────────────────── */
+
+async function loadFormFields(client: ReturnType<typeof createReadonlyClient>, formId: string): Promise<Record<string, unknown>[]> {
+  const { data } = await client
+    .from("form_fields")
+    .select("*")
+    .eq("form_id", formId)
+    .order("sort_order");
+  return (data ?? []) as Record<string, unknown>[];
+}
+
+function normalizeFormField(f: Record<string, unknown>): FormFieldDef {
+  return {
+    id: String(f.id ?? ""),
+    name: String(f.name ?? ""),
+    type: (f.type as FormFieldDef["type"]) || "text",
+    label: (f.label as { en: string; ar: string }) || { en: "", ar: "" },
+    placeholder: (f.placeholder as { en: string; ar: string } | null) ?? null,
+    help_text: (f.help_text as { en: string; ar: string } | null) ?? null,
+    required: Boolean(f.required),
+    options: Array.isArray(f.options) ? (f.options as FormFieldDef["options"]) : [],
+    sort_order: Number(f.sort_order ?? 0),
+  };
+}
+
+/** Resolve the form a career uses: its linked form, else the default application form. */
+export async function getCareerForm(applicationFormId?: string | null): Promise<FormDef> {
+  if (!applicationFormId) return DEFAULT_APPLICATION_FORM;
+
+  const row = await fromSupabase(async (c) => {
+    const { data: form } = await c
+      .from("forms")
+      .select("*")
+      .eq("id", applicationFormId)
+      .maybeSingle();
+    if (!form) return null;
+    const fields = await loadFormFields(c, applicationFormId);
+    return {
+      id: String((form as Record<string, unknown>).id),
+      slug: String((form as Record<string, unknown>).slug ?? ""),
+      name: (form as Record<string, unknown>).name as { en: string; ar: string },
+      description: (form as Record<string, unknown>).description as { en: string; ar: string } | null,
+      is_default: Boolean((form as Record<string, unknown>).is_default),
+      entity: "application",
+      fields: fields.map(normalizeFormField),
+    } as FormDef;
+  });
+
+  return row ?? DEFAULT_APPLICATION_FORM;
 }
 
 /* ── Cargo types ──────────────────────────────────────────── */

@@ -398,6 +398,8 @@ create table if not exists public.forms (
   name jsonb not null,
   description jsonb,
   enabled boolean default true,
+  is_default boolean default false,
+  entity text default 'application',
   settings jsonb default '{}',
   created_at timestamptz default now()
 );
@@ -418,6 +420,10 @@ create table if not exists public.form_fields (
   sort_order integer default 0
 );
 alter table public.form_fields enable row level security;
+create policy "public read form fields" on public.form_fields for select using (true);
+create policy "public read forms" on public.forms for select using (true);
+
+alter table public.careers add column if not exists application_form_id uuid references public.forms(id) on delete set null;
 
 create table if not exists public.form_submissions (
   id uuid primary key default gen_random_uuid(),

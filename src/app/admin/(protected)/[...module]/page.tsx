@@ -5,6 +5,7 @@ import { CrudManager } from "@/components/admin/crud-manager";
 import { MediaLibrary } from "@/components/admin/media-library";
 import { SeoSettings } from "@/components/admin/seo-settings";
 import { EmailSettings } from "@/components/admin/email-settings";
+import { FormBuilder } from "@/components/admin/form-builder";
 
 const slugToTable: Record<string, string> = {
   social: "social_links",
@@ -65,6 +66,18 @@ export default async function AdminModulePage({
         <p className="mt-1 text-sm text-ink-muted">SMTP / IMAP configuration and notifications.</p>
         <div className="mt-6">
           <EmailSettings />
+        </div>
+      </div>
+    );
+  }
+
+  if (slug === "forms") {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-brand-900">Job Application Forms</h1>
+        <p className="mt-1 text-sm text-ink-muted">Build and edit the application forms used across vacancies.</p>
+        <div className="mt-6">
+          <FormBuilder />
         </div>
       </div>
     );
