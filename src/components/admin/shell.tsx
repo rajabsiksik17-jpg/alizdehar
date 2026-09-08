@@ -47,6 +47,7 @@ const navGroups: NavGroup[] = [
     label: "Leads",
     labelAr: "الطلبات والعملاء",
     items: [
+      { label: "Notifications", labelAr: "الإشعارات", href: "/admin/leads", icon: "bell", permission: "leads" },
       { label: "Quote Requests", labelAr: "طلبات عرض السعر", href: "/admin/leads?type=quote", icon: "mail", permission: "leads" },
       { label: "Contact Requests", labelAr: "رسائل التواصل", href: "/admin/leads?type=contact", icon: "mail", permission: "leads" },
       { label: "Career Applications", labelAr: "طلبات الوظائف", href: "/admin/leads?type=career", icon: "briefcase", permission: "leads" },
@@ -76,11 +77,13 @@ export function AdminShell({
   email,
   role,
   permissions,
+  unreadNotifications = 0,
   children,
 }: {
   email: string;
   role: string;
   permissions: string[];
+  unreadNotifications?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname() || "";
@@ -91,6 +94,13 @@ export function AdminShell({
   const groups = navGroups
     .map((g) => ({ ...g, items: g.items.filter((i) => permissions.includes(i.permission)) }))
     .filter((g) => g.items.length > 0);
+
+  const notificationBadge =
+    unreadNotifications > 0
+      ? unreadNotifications > 99
+        ? "99+"
+        : String(unreadNotifications)
+      : null;
 
   async function signOut() {
     const supabase = createClient();
@@ -129,7 +139,12 @@ export function AdminShell({
                       )}
                     >
                       <Icon name={item.icon} className="h-4 w-4" />
-                      {t(item.label, item.labelAr)}
+                      <span className="flex-1">{t(item.label, item.labelAr)}</span>
+                      {item.icon === "bell" && notificationBadge ? (
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold leading-none text-white">
+                          {notificationBadge}
+                        </span>
+                      ) : null}
                     </Link>
                   </li>
                 );

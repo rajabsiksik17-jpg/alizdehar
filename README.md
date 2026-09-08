@@ -98,6 +98,24 @@ changes appear immediately.
 3. Visit `/admin`, sign in. No password is stored in source code — auth is fully
    handled by Supabase Auth, and the service-role key is never sent to the browser.
 
+### Security, OTP & email
+
+- **New-device OTP**: after a successful password sign-in from an unrecognized
+  device/browser, the admin must enter a 6-digit code emailed to their address before
+  entering the dashboard. OTPs are hashed at rest, short-lived, and rate-limited.
+  Trusted devices are remembered (opaque token, hashed) so the challenge is only shown once.
+- **Brute-force protection**: a server-side pre-login rate limit locks out repeated
+  sign-in attempts (escalating window). Login/new-device events are logged and emailed
+  as security notifications.
+- **Email**: set SMTP under **Settings → Email**, then run **Test SMTP connection**.
+  Outbound mail (customer confirmations + admin notifications) is only active once the
+  connection test succeeds — saving settings alone never marks email as "connected".
+  IMAP is stored but not auto-verified (no in-process IMAP client); it does not block
+  outbound notifications.
+- **Spam protection**: all public forms (contact, quote, career, newsletter) are guarded
+  server-side by honeypots + multi-signal rate limiting (email / device / network) with
+  escalating temporary bans, designed to reduce false positives on shared networks.
+
 > Phone, email, address and social URLs are intentionally empty in the seed (they are not in
 > the source document). Set them under **Settings → General** in the admin or directly in the
 > `settings` table. The UI hides empty contact details gracefully.

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
+import { clientInfo, checkRateLimit, hashSignal } from "@/lib/security";
 
 function validEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -20,6 +21,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false }, { status: 422 });
   }
 
+  const info = clientInfo(request);
+  const signals = [email, hashSignal(`fp:${info.userAgent}`), info.ip];
+  const results = await Promise.all(
+    signals.map((s) => checkRateLimit({ scope: "form:newsletter", signalKey: s, limit: 5 })),
+  );
+  if (results.some((r) => !r.allowed)) {
+    return NextResponse.json({ success: false, error: "Too many requests." }, { status: 429 });
+  }
+
   if (isSupabaseConfigured()) {
     try {
       const admin = createAdminClient();
@@ -28,7 +38,7 @@ export async function POST(request: Request) {
         { onConflict: "email" },
       );
     } catch {
-      // Fail open in dev.
+      return NextResponse.json({ success: false, error: "Failed to subscribe" }, { status: 500 });
     }
   }
 

@@ -12,10 +12,19 @@ const typeLabel: Record<string, string> = {
   career: "Application",
 };
 
+interface SecurityEvent {
+  id: string;
+  type: string;
+  browser: string | null;
+  os: string | null;
+  created_at: string;
+}
+
 export function NotificationsBell() {
   const { t, lang } = useAdminLang();
   const [unread, setUnread] = useState(0);
   const [recent, setRecent] = useState<Lead[]>([]);
+  const [security, setSecurity] = useState<SecurityEvent[]>([]);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -26,6 +35,7 @@ export function NotificationsBell() {
       if (res.ok) {
         setUnread(json.unread ?? 0);
         setRecent(json.recent ?? []);
+        setSecurity(json.security ?? []);
       }
     } catch {
       // ignore
@@ -49,18 +59,21 @@ export function NotificationsBell() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  async function markAll() {
+  async function markAll(kind: "leads" | "security") {
     try {
       await fetch("/api/admin/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ kind }),
       });
       await refresh();
     } catch {
       // ignore
     }
   }
+
+  const hasSecurity = security.length > 0;
+  const hasLeads = recent.length > 0;
 
   return (
     <div ref={wrapRef} className="relative">
@@ -72,7 +85,7 @@ export function NotificationsBell() {
       >
         <Icon name="bell" className="h-4 w-4" />
         {unread > 0 ? (
-          <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-600 px-1 text-[10px] font-bold leading-none text-white">
+          <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
             {unread > 99 ? "99+" : unread}
           </span>
         ) : null}
@@ -85,7 +98,10 @@ export function NotificationsBell() {
             {unread > 0 ? (
               <button
                 type="button"
-                onClick={markAll}
+                onClick={() => {
+                  markAll("leads");
+                  markAll("security");
+                }}
                 className="text-xs font-semibold text-brand-700 hover:text-accent-600"
               >
                 {t("Mark all read", "تحديد الكل كمقروء")}
@@ -93,35 +109,63 @@ export function NotificationsBell() {
             ) : null}
           </div>
           <div className="max-h-96 overflow-y-auto">
-            {recent.length ? (
-              <ul className="divide-y divide-brand-50">
-                {recent.map((lead) => (
-                  <li key={lead.id}>
-                    <Link
-                      href="/admin/leads"
-                      onClick={() => setOpen(false)}
-                      className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-surface-muted"
-                    >
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
-                        <Icon name="mail" className="h-4 w-4" />
+            {hasSecurity ? (
+              <div>
+                <p className="px-4 pt-3 text-[11px] font-bold uppercase tracking-wider text-ink-muted">{t("Security", "الأمان")}</p>
+                <ul className="divide-y divide-brand-50">
+                  {security.map((ev) => (
+                    <li key={ev.id} className="flex items-start gap-3 px-4 py-3">
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+                        <Icon name="shield" className="h-4 w-4" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-brand-900">{lead.name}</span>
-                        <span className="block truncate text-xs text-ink-muted">{lead.service || lead.email}</span>
+                        <span className="block text-sm font-medium text-brand-900">
+                          {ev.type === "new_device_login" ? t("New device sign-in", "دخول من جهاز جديد") : ev.type}
+                        </span>
+                        <span className="block truncate text-xs text-ink-muted">
+                          {[ev.browser, ev.os].filter(Boolean).join(" · ")}
+                        </span>
                       </span>
-                      <span className="shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
-                        {lang === "ar" ? typeLabel[lead.type] ?? lead.type : typeLabel[lead.type] ?? lead.type}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {hasLeads ? (
+              <div>
+                <p className="px-4 pt-3 text-[11px] font-bold uppercase tracking-wider text-ink-muted">{t("Leads", "الطلبات")}</p>
+                <ul className="divide-y divide-brand-50">
+                  {recent.map((lead) => (
+                    <li key={lead.id}>
+                      <Link
+                        href="/admin/leads"
+                        onClick={() => setOpen(false)}
+                        className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-surface-muted"
+                      >
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+                          <Icon name="mail" className="h-4 w-4" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-medium text-brand-900">{lead.name}</span>
+                          <span className="block truncate text-xs text-ink-muted">{lead.service || lead.email}</span>
+                        </span>
+                        <span className="shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
+                          {lang === "ar" ? typeLabel[lead.type] ?? lead.type : typeLabel[lead.type] ?? lead.type}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {!hasSecurity && !hasLeads ? (
               <div className="px-4 py-10 text-center">
                 <Icon name="check-check" className="mx-auto h-8 w-8 text-brand-200" />
                 <p className="mt-2 text-sm text-ink-muted">{t("You're all caught up.", "لا توجد إشعارات جديدة.")}</p>
               </div>
-            )}
+            ) : null}
           </div>
           <Link
             href="/admin/leads"

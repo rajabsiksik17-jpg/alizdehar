@@ -5,6 +5,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/config";
 import { PhoneInput, type PhoneValue } from "@/components/phone-input";
 import { SearchSelect } from "@/components/search-select";
+import { SuccessScreen } from "@/components/success-screen";
 
 const input =
   "w-full rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-muted/60 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
@@ -43,6 +44,8 @@ export function ContactForm({
       phone_country: phone.country,
       phone_dial_code: phone.dialCode,
       phone_e164: phone.e164,
+      locale,
+      source_page: typeof window !== "undefined" ? window.location.pathname : "",
     };
     try {
       const res = await fetch("/api/contact", {
@@ -61,9 +64,15 @@ export function ContactForm({
 
   if (state === "done") {
     return (
-      <p className="rounded-xl bg-brand-50 px-5 py-4 text-sm font-semibold text-brand-800">
-        {dict.quote.success}
-      </p>
+      <SuccessScreen
+        locale={locale}
+        title={L(locale, "Your message has been received successfully!", "تم استلام رسالتك بنجاح!")}
+        subtitle={L(
+          locale,
+          "Thank you for contacting Al-Izdehar Logistics. Our team will reach out to you soon.",
+          "شكراً لتواصلك مع الإزدهار للوجستيات. سيتواصل معك فريقنا قريباً.",
+        )}
+      />
     );
   }
 
@@ -128,6 +137,9 @@ export function ContactForm({
           placeholder={L(locale, "Write the details of your inquiry…", "اكتب تفاصيل استفسارك…")}
           className={input}
         />
+      </div>
+      <div className="hidden" aria-hidden="true">
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" />
       </div>
       <button
         type="submit"

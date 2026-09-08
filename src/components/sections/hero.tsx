@@ -16,6 +16,7 @@ type Slide = {
   icon?: string;
   url?: string;
   cta?: { en: string; ar: string };
+  read_more_url?: string;
   background?: string;
 };
 
@@ -90,13 +91,24 @@ export function HeroSlider({ section, locale }: { section: PageSection; locale: 
               <h2 className="mt-6 text-2xl font-bold text-white md:text-3xl">{pick(slide.title, locale)}</h2>
               <p className="mt-1 text-sm font-semibold text-accent-300">{pick(slide.subtitle, locale)}</p>
               <p className="mt-4 flex-1 leading-relaxed text-white/70">{pick(slide.description, locale)}</p>
-              <a
-                href={href(locale, slide.url || "/services")}
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent-300 transition-colors hover:text-accent-200"
-              >
-                {pick(slide.cta, locale)}
-                <Icon name="arrow-right" className="h-4 w-4 rtl:rotate-180" />
-              </a>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <a
+                  href={href(locale, slide.read_more_url || slide.url || "/services")}
+                  className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-5 py-2.5 text-sm font-semibold text-brand-950 transition-all hover:-translate-y-0.5 hover:bg-accent-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-400"
+                >
+                  {dict.actions.readMore}
+                  <Icon name="arrow-right" className="h-4 w-4 rtl:rotate-180" />
+                </a>
+                {slide.cta ? (
+                  <a
+                    href={href(locale, slide.url || "/services")}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-accent-300 transition-colors hover:text-accent-200"
+                  >
+                    {pick(slide.cta, locale)}
+                    <Icon name="arrow-right" className="h-4 w-4 rtl:rotate-180" />
+                  </a>
+                ) : null}
+              </div>
             </div>
           </div>
 

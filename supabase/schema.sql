@@ -442,3 +442,97 @@ create index if not exists form_submissions_form_idx on public.form_submissions 
 insert into storage.buckets (id, name, public)
 values ('applications', 'applications', false)
 on conflict (id) do nothing;
+
+-- ============================================================================
+-- Refinements (added in migrations 0003–0006 — kept inline for fresh installs)
+-- ============================================================================
+
+-- Email settings (outgoing SMTP + incoming IMAP + notification toggles)
+create table if not exists public.email_settings (
+  id integer primary key default 1 check (id = 1),
+  smtp_host text,
+  smtp_port integer,
+  smtp_secure boolean default true,
+  smtp_user text,
+  smtp_pass text,
+  from_name text,
+  from_email text,
+  reply_to text,
+  imap_host text,
+  imap_port integer,
+  imap_secure boolean default true,
+  imap_user text,
+  imap_pass text,
+  notify_quote boolean default true,
+  notify_contact boolean default true,
+  notify_application boolean default true,
+  notify_security boolean default true,
+  notify_login boolean default true,
+  admin_email text,
+  auto_reply boolean default true,
+  smtp_status text,
+  smtp_verified boolean default false,
+  imap_status text,
+  imap_verified boolean default false,
+  updated_at timestamptz default now()
+);
+alter table public.email_settings enable row level security;
+
+-- Leads: pick-up / shipping address
+alter table public.leads add column if not exists pickup_location text;
+alter table public.leads add column if not exists shipping_address text;
+
+-- Security events
+create table if not exists public.security_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  type text not null,
+  ip text,
+  browser text,
+  os text,
+  meta jsonb default '{}',
+  is_read boolean default false,
+  created_at timestamptz default now()
+);
+alter table public.security_events enable row level security;
+
+-- Rate limiting (persistent, multi-signal)
+create table if not exists public.rate_limits (
+  id uuid primary key default gen_random_uuid(),
+  scope text not null,
+  signal_key text not null,
+  count integer default 0,
+  window_start timestamptz default now(),
+  blocked_until timestamptz,
+  strikes integer default 0,
+  updated_at timestamptz default now(),
+  unique (scope, signal_key)
+);
+alter table public.rate_limits enable row level security;
+create index if not exists rate_limits_lookup_idx on public.rate_limits (scope, signal_key);
+
+-- Trusted devices
+create table if not exists public.trusted_devices (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  token_hash text not null,
+  browser text,
+  os text,
+  verified_at timestamptz default now(),
+  last_seen_at timestamptz default now(),
+  unique (user_id, token_hash)
+);
+alter table public.trusted_devices enable row level security;
+
+-- Admin OTP
+create table if not exists public.admin_otp (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  code_hash text not null,
+  purpose text not null default 'login',
+  expires_at timestamptz not null,
+  attempts integer default 0,
+  created_at timestamptz default now()
+);
+alter table public.admin_otp enable row level security;
+create index if not exists admin_otp_user_idx on public.admin_otp (user_id, created_at desc);

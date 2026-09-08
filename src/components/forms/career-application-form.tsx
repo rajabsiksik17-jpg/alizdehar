@@ -8,6 +8,7 @@ import { SearchSelect } from "@/components/search-select";
 import { countries, countryByCode } from "@/lib/phone";
 import type { FormDef, FormFieldDef } from "@/lib/job-forms";
 import { Icon } from "@/components/icon";
+import { SuccessScreen } from "@/components/success-screen";
 
 const input =
   "w-full rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-muted/60 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
@@ -85,6 +86,7 @@ export function CareerApplicationForm({
     fd.set("phone_dial_code", phone.dialCode);
     fd.set("phone_e164", phone.e164);
     fd.set("country", countryByCode(country)?.name ?? "");
+    fd.set("locale", locale);
     fd.set("website", ""); // honeypot
 
     try {
@@ -101,9 +103,15 @@ export function CareerApplicationForm({
 
   if (state === "done") {
     return (
-      <p className="rounded-xl bg-brand-50 px-5 py-4 text-sm font-semibold text-brand-800">
-        {dict.quote.success}
-      </p>
+      <SuccessScreen
+        locale={locale}
+        title={L(locale, "Your application has been received successfully!", "تم استلام طلبك بنجاح!")}
+        subtitle={L(
+          locale,
+          "Thank you for applying. Our team will review your application and contact you soon.",
+          "شكراً لتقديمك. سيراجع فريقنا طلبك وسيتواصل معك قريباً.",
+        )}
+      />
     );
   }
 

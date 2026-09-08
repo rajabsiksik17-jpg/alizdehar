@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@/components/icon";
 import { PhoneInput, type PhoneValue } from "@/components/phone-input";
 import { SearchSelect } from "@/components/search-select";
+import { SuccessScreen } from "@/components/success-screen";
 
 const input =
   "w-full rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-muted/60 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
@@ -112,12 +113,14 @@ export function QuoteForm({
   const [cargoType, setCargoType] = useState("");
   const [shipmentSize, setShipmentSize] = useState("");
   const [urgency, setUrgency] = useState("");
+  const [pickupLocation, setPickupLocation] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [length, setLength] = useState("");
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
-  const [dimUnit, setDimUnit] = useState("m");
+  const [dimUnit, setDimUnit] = useState("m²");
   const [packages, setPackages] = useState("1");
   const [weight, setWeight] = useState("");
   const [weightUnit, setWeightUnit] = useState("kg");
@@ -126,6 +129,14 @@ export function QuoteForm({
   const [message, setMessage] = useState("");
 
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  // Shipment area (m²) derived from length × width when both are numeric.
+  const area = useMemo(() => {
+    const l = parseFloat(length);
+    const w = parseFloat(width);
+    if (!Number.isFinite(l) || !Number.isFinite(w)) return "";
+    return (l * w).toFixed(2);
+  }, [length, width]);
 
   const serviceOptions = services.map((s) => ({ value: s.slug, label: s.name }));
   const cargoOptions = cargoTypes.map((c) => ({ value: c, label: c }));
@@ -175,11 +186,13 @@ export function QuoteForm({
       cargo_description: cargoDescription,
       shipment_size: shipmentSize,
       urgency,
+      pickup_location: pickupLocation,
+      shipping_address: shippingAddress,
       origin,
       destination,
       weight,
       weight_unit: weightUnit,
-      dimensions: { length, width, height, unit: dimUnit, packages },
+      dimensions: { length, width, height, unit: dimUnit, packages, area },
       shipping_date: shippingDate,
       message,
       locale,
@@ -205,15 +218,15 @@ export function QuoteForm({
 
   if (done) {
     return (
-      <div className="rounded-2xl bg-brand-50 px-6 py-12 text-center">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-800 text-white">
-          <Icon name="check" className="h-7 w-7" />
-        </span>
-        <h3 className="mt-5 text-xl font-bold text-brand-900">{dict.quote.success}</h3>
-        <p className="mt-2 text-sm text-ink-muted">
-          {L(locale, "Our team will get back to you shortly.", "سيتواصل معك فريقنا في أقرب وقت ممكن.")}
-        </p>
-      </div>
+      <SuccessScreen
+        locale={locale}
+        title={L(locale, "Your request has been received successfully!", "تم استلام طلبك بنجاح!")}
+        subtitle={L(
+          locale,
+          "Thank you for contacting Al-Izdehar Logistics. We will get back to you as soon as possible.",
+          "شكراً لتواصلك مع الإزدهار للوجستيات. سنتواصل معك في أقرب وقت ممكن.",
+        )}
+      />
     );
   }
 
@@ -360,13 +373,18 @@ export function QuoteForm({
               <div>
                 <label className="mb-1 block text-xs font-medium text-ink-muted">{L(locale, "Unit", "الوحدة")}</label>
                 <select value={dimUnit} onChange={(e) => setDimUnit(e.target.value)} className={input}>
-                  <option value="m">m</option>
-                  <option value="cm">cm</option>
-                  <option value="in">in</option>
-                  <option value="ft">ft</option>
+                  <option value="m²">m²</option>
+                  <option value="cm²">cm²</option>
+                  <option value="ft²">ft²</option>
+                  <option value="in²">in²</option>
                 </select>
               </div>
             </div>
+            {area ? (
+              <p className="mt-3 rounded-lg bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-700">
+                {L(locale, `Approx. area:`, `المساحة التقريبية:`)} {area} {dimUnit}
+              </p>
+            ) : null}
             <div className="mt-3">
               <label className="mb-1 block text-xs font-medium text-ink-muted">
                 {L(locale, "Number of packages", "عدد الطرود")}
@@ -407,30 +425,67 @@ export function QuoteForm({
 
       {/* Step 3 — Details */}
       {step === 2 ? (
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="qf-cdesc" className="mb-1.5 block text-sm font-semibold text-brand-900">
-              {L(locale, "Describe your cargo", "صف بضاعتك")}
-            </label>
-            <textarea
-              id="qf-cdesc"
-              rows={4}
-              value={cargoDescription}
-              onChange={(e) => setCargoDescription(e.target.value)}
-              placeholder={L(
-                locale,
-                "Please briefly describe the goods, quantity, packaging, and any special handling requirements.",
-                "يرجى وصف البضاعة والكمية والتغليف وأي متطلبات مناولة خاصة بشكل مختصر.",
-              )}
-              className={input}
-            />
-          </div>
-          <div>
-            <label htmlFor="qf-msg" className="mb-1.5 block text-sm font-semibold text-brand-900">
-              {dict.quote.message}
-            </label>
-            <textarea id="qf-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} className={input} />
-          </div>
+        <div className="space-y-6">
+          {/* Pick up location & shipping address */}
+          <section>
+            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-brand-900">
+              {L(locale, "Pick up location and Shipping address", "موقع الاستلام وعنوان الشحن")}
+            </h3>
+            <div className="space-y-4">
+              <TextField
+                id="qf-pickup"
+                label={L(locale, "Pick up Location", "موقع الاستلام")}
+                value={pickupLocation}
+                onChange={setPickupLocation}
+                placeholder={L(locale, "City, port or warehouse", "المدينة أو الميناء أو المستودع")}
+              />
+              <div>
+                <label htmlFor="qf-address" className="mb-1.5 block text-sm font-semibold text-brand-900">
+                  {L(locale, "Shipping Address", "عنوان الشحن")}
+                </label>
+                <textarea
+                  id="qf-address"
+                  rows={2}
+                  value={shippingAddress}
+                  onChange={(e) => setShippingAddress(e.target.value)}
+                  placeholder={L(locale, "Full delivery address", "عنوان التسليم الكامل")}
+                  className={input}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Important notes */}
+          <section>
+            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-brand-900">
+              {L(locale, "Important Notes", "ملاحظات هامة")}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="qf-cdesc" className="mb-1.5 block text-sm font-semibold text-brand-900">
+                  {L(locale, "Describe your cargo", "صف بضاعتك")}
+                </label>
+                <textarea
+                  id="qf-cdesc"
+                  rows={4}
+                  value={cargoDescription}
+                  onChange={(e) => setCargoDescription(e.target.value)}
+                  placeholder={L(
+                    locale,
+                    "Please briefly describe the goods, quantity, packaging, and any special handling requirements.",
+                    "يرجى وصف البضاعة والكمية والتغليف وأي متطلبات مناولة خاصة بشكل مختصر.",
+                  )}
+                  className={input}
+                />
+              </div>
+              <div>
+                <label htmlFor="qf-msg" className="mb-1.5 block text-sm font-semibold text-brand-900">
+                  {L(locale, "Additional notes", "ملاحظات إضافية")}
+                </label>
+                <textarea id="qf-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} className={input} />
+              </div>
+            </div>
+          </section>
         </div>
       ) : null}
 
@@ -443,8 +498,11 @@ export function QuoteForm({
           <ReviewRow label={dict.quote.service} value={selectedService?.name || ""} />
           {cargoType ? <ReviewRow label={L(locale, "Cargo Type", "نوع البضاعة")} value={cargoType} /> : null}
           {shipmentSize ? <ReviewRow label={L(locale, "Shipment Size", "حجم الشحنة")} value={shipmentSize} /> : null}
+          {pickupLocation ? <ReviewRow label={L(locale, "Pick up Location", "موقع الاستلام")} value={pickupLocation} /> : null}
+          {shippingAddress ? <ReviewRow label={L(locale, "Shipping Address", "عنوان الشحن")} value={shippingAddress} /> : null}
           {origin ? <ReviewRow label={dict.quote.origin} value={origin} /> : null}
           {destination ? <ReviewRow label={dict.quote.destination} value={destination} /> : null}
+          {area ? <ReviewRow label={L(locale, "Shipment Area", "مساحة الشحنة")} value={`${area} ${dimUnit}`} dir="ltr" /> : null}
           {weight ? <ReviewRow label={dict.quote.weight} value={`${weight} ${weightUnit}`} dir="ltr" /> : null}
           {shippingDate ? <ReviewRow label={dict.quote.date} value={shippingDate} /> : null}
           {cargoDescription ? <ReviewRow label={L(locale, "Cargo Description", "وصف البضاعة")} value={cargoDescription} /> : null}

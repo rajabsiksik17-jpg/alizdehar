@@ -30,13 +30,13 @@ export async function POST(req: Request) {
   }
 
   const row: Record<string, unknown> = { id: 1 };
-  for (const f of ["smtp_host", "smtp_user", "from_name", "from_email", "reply_to", "imap_host", "imap_user"]) {
+  for (const f of ["smtp_host", "smtp_user", "from_name", "from_email", "reply_to", "imap_host", "imap_user", "admin_email"]) {
     if (body[f] !== undefined) row[f] = body[f] ? String(body[f]) : null;
   }
   for (const f of ["smtp_port", "imap_port"]) {
     if (body[f] !== undefined) row[f] = body[f] ? Number(body[f]) : null;
   }
-  for (const f of ["smtp_secure", "imap_secure", "notify_quote", "notify_contact", "notify_application", "auto_reply"]) {
+  for (const f of ["smtp_secure", "imap_secure", "notify_quote", "notify_contact", "notify_application", "notify_security", "notify_login", "auto_reply"]) {
     if (body[f] !== undefined) row[f] = Boolean(body[f]);
   }
   // Passwords: only overwrite when a non-empty value is provided (never sent back to client).

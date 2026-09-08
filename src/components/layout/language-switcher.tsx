@@ -8,6 +8,16 @@ import { dir, getDictionary } from "@/lib/i18n/config";
 import { switchLocalePath } from "@/lib/site";
 import { Icon } from "@/components/icon";
 
+const COOKIE = "NEXT_LOCALE";
+
+function persistLocale(code: Locale) {
+  try {
+    document.cookie = `${COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  } catch {
+    // ignore (cookie may be blocked)
+  }
+}
+
 export function LanguageSwitcher({ locale }: { locale: Locale }) {
   const pathname = usePathname() || "";
   const [open, setOpen] = useState(false);
@@ -42,7 +52,10 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
             <li key={t.code} role="option" aria-selected={t.code === locale}>
               <Link
                 href={switchLocalePath(pathname, t.code)}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  persistLocale(t.code);
+                  setOpen(false);
+                }}
                 className={`flex items-center justify-between px-4 py-2 text-sm hover:bg-brand-50 ${
                   t.code === locale ? "font-bold text-brand-800" : "text-ink-muted"
                 }`}
