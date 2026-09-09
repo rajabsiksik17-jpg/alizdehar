@@ -102,8 +102,11 @@ changes appear immediately.
 
 - **New-device OTP**: after a successful password sign-in from an unrecognized
   device/browser, the admin must enter a 6-digit code emailed to their address before
-  entering the dashboard. OTPs are hashed at rest, short-lived, and rate-limited.
-  Trusted devices are remembered (opaque token, hashed) so the challenge is only shown once.
+  entering the dashboard. OTPs are hashed at rest, short-lived, rate-limited, single-use,
+  and bound to the exact sign-in attempt via a per-attempt challenge id (HttpOnly cookie),
+  so verification is reliable across requests in production. Trusted devices are remembered
+  (opaque token, hashed) so the challenge is only shown once. `/admin` is gated server-side
+  until the challenge completes.
 - **Brute-force protection**: a server-side pre-login rate limit locks out repeated
   sign-in attempts (escalating window). Login/new-device events are logged and emailed
   as security notifications.

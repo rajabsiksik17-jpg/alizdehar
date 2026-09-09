@@ -247,21 +247,33 @@ export function otpEmail(opts: {
   const rtl = context.locale === "ar";
   const t = {
     head: rtl ? "رمز التحقق من الدخول" : "Your login verification code",
+    greeting: rtl ? "أهلاً بك،" : "Hello,",
     note: rtl
-      ? "أدخل الرمز التالي لإكمال تسجيل الدخول إلى لوحة التحكم. لا تشارك هذا الرمز مع أي شخص."
-      : "Enter the following code to complete signing in to the admin dashboard. Do not share this code with anyone.",
+      ? "أدخل الرمز التالي لإكمال تسجيل الدخول إلى لوحة التحكم."
+      : "Enter the following code to complete signing in to the admin dashboard.",
     expires: rtl
       ? `تنتهي صلاحية هذا الرمز خلال ${expiresInMinutes} دقيقة.`
       : `This code expires in ${expiresInMinutes} minutes.`,
+    warnTitle: rtl ? "تنبيه أمني" : "Security notice",
+    warn: rtl
+      ? "لا تشارك هذا الرمز مع أي شخص. لن يطلب منك فريق الإزدهار هذا الرمز أبداً."
+      : "Do not share this code with anyone. Al-Izdehar will never ask you for this code.",
   };
+
+  const spacedCode = code.split("").join(" ");
+
   const body = `
-    <p style="margin:0 0 16px;font-size:15px;color:#3a4859;line-height:1.7;">${t.note}</p>
-    <div style="background:#0f2a48;border-radius:12px;padding:22px;text-align:center;">
-      <div style="font-size:32px;font-weight:800;letter-spacing:0.5em;color:#ffffff;">${code}</div>
+    <p style="margin:0 0 16px;font-size:15px;color:#3a4859;line-height:1.7;">${t.greeting}<br />${t.note}</p>
+    <div style="background:#0f2a48;border-radius:12px;padding:26px;text-align:center;">
+      <div style="font-size:34px;font-weight:800;letter-spacing:0.35em;color:#ffffff;font-family:'Courier New',monospace;">${spacedCode}</div>
     </div>
     <p style="margin:16px 0 0;font-size:12px;color:#8895a7;">${t.expires}</p>
+    <div style="margin-top:16px;background:#fdf3e7;border:1px solid #f5dfbc;border-radius:10px;padding:12px 16px;">
+      <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#7a5a1f;">${t.warnTitle}</p>
+      <p style="margin:0;font-size:12px;color:#7a5a1f;line-height:1.6;">${t.warn}</p>
+    </div>
   `;
-  return baseTemplate({ locale: context.locale, title: t.head, bodyHtml: body, context });
+  return baseTemplate({ locale: context.locale, title: t.head, bodyHtml: body, context, preheader: code });
 }
 
 /** Security notification (new device login). */

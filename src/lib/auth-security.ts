@@ -65,6 +65,12 @@ export async function trustDevice(userId: string, browser: string, os: string): 
   return token;
 }
 
+/** True when OTP enforcement is possible (SMTP configured to deliver codes). */
+export async function isOtpApplicable(): Promise<boolean> {
+  const settings = await getEmailSettings();
+  return isSmtpConfigured(settings);
+}
+
 /** Mark all sessions of a user as untrusted (revoke). */
 export async function revokeTrustedDevices(userId: string): Promise<void> {
   if (!isSupabaseConfigured()) return;
@@ -78,78 +84,124 @@ export async function revokeTrustedDevices(userId: string): Promise<void> {
 
 /* ── OTP ─────────────────────────────────────────────────── */
 
+const OTP_CHALLENGE_COOKIE = "izdehar_otp_challenge";
+
+export interface OtpIssueResult {
+  sent: boolean;
+  challengeId?: string;
+  error?: string;
+  waitSeconds?: number;
+}
+
 export async function issueLoginOtp(opts: {
   userId: string;
   email: string;
   locale: "en" | "ar";
   browser: string;
   os: string;
-}): Promise<{ sent: boolean; error?: string; waitSeconds?: number }> {
+}): Promise<OtpIssueResult> {
   const settings = await getEmailSettings();
   if (!isSmtpConfigured(settings)) {
     return { sent: false, error: "Email is not configured, so the OTP cannot be sent." };
   }
 
-  // Rate-limit OTP issuance per user.
+  // Rate-limit OTP issuance per user AND per email, to prevent resend spam.
   const { checkRateLimit } = await import("@/lib/security");
-  const rl = await checkRateLimit({ scope: "otp:issue", signalKey: opts.userId, limit: 3 });
-  if (!rl.allowed) {
-    return { sent: false, error: "Too many OTP requests.", waitSeconds: rl.retryAfterSeconds };
+  const [byUser, byEmail] = await Promise.all([
+    checkRateLimit({ scope: "otp:issue:user", signalKey: opts.userId, limit: 4 }),
+    checkRateLimit({ scope: "otp:issue:email", signalKey: opts.email, limit: 4 }),
+  ]);
+  const hit = [byUser, byEmail].find((r) => !r.allowed);
+  if (hit) {
+    return { sent: false, error: "Too many OTP requests.", waitSeconds: hit.retryAfterSeconds };
   }
 
   const code = generateOtp(6);
+  const challengeId = generateToken();
   const expiresAt = new Date(Date.now() + OTP_MINUTES * 60 * 1000);
 
   if (isSupabaseConfigured()) {
     const admin = createAdminClient();
-    // Invalidate previous codes for this user.
-    await admin.from("admin_otp").update({ attempts: OTP_MAX_ATTEMPTS + 1 }).eq("user_id", opts.userId).eq("purpose", "login");
-    await admin.from("admin_otp").insert({
+    // Invalidate any previous active codes for this user (both consumed and superseded).
+    await admin
+      .from("admin_otp")
+      .update({ consumed: true })
+      .eq("user_id", opts.userId)
+      .eq("purpose", "login")
+      .eq("consumed", false);
+
+    const { error } = await admin.from("admin_otp").insert({
       user_id: opts.userId,
       code_hash: sha256(code),
       purpose: "login",
+      challenge_id: challengeId,
+      consumed: false,
       expires_at: expiresAt.toISOString(),
     });
+    if (error) {
+      return { sent: false, error: error.message };
+    }
   }
 
   try {
     await sendOtpEmail({ locale: opts.locale, to: opts.email, code, expiresInMinutes: OTP_MINUTES });
-    return { sent: true };
+    return { sent: true, challengeId };
   } catch (e) {
     return { sent: false, error: e instanceof Error ? e.message : "Failed to send OTP." };
   }
 }
 
+export interface OtpVerifyResult {
+  ok: boolean;
+  userId?: string;
+  error?: string;
+  expired?: boolean;
+  attemptsExceeded?: boolean;
+}
+
 export async function verifyLoginOtp(opts: {
-  userId: string;
+  challengeId: string;
   code: string;
-}): Promise<{ ok: boolean; error?: string }> {
-  if (!isSupabaseConfigured()) return { ok: true }; // no email => can't have issued; but should already be blocked upstream
+}): Promise<OtpVerifyResult> {
+  if (!isSupabaseConfigured()) return { ok: true };
   try {
     const admin = createAdminClient();
     const { data } = await admin
       .from("admin_otp")
       .select("*")
-      .eq("user_id", opts.userId)
+      .eq("challenge_id", opts.challengeId)
       .eq("purpose", "login")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
 
     if (!data) return { ok: false, error: "No verification code was issued. Please request a new code." };
-    if (new Date(data.expires_at) < new Date()) return { ok: false, error: "This code has expired." };
-    if (data.attempts >= OTP_MAX_ATTEMPTS) return { ok: false, error: "Too many attempts. Please request a new code." };
+    if (data.consumed) return { ok: false, error: "This code has already been used. Please request a new code." };
+    if (new Date(data.expires_at) < new Date()) return { ok: false, expired: true, error: "This code has expired. Please request a new code." };
+    if (data.attempts >= OTP_MAX_ATTEMPTS) return { ok: false, attemptsExceeded: true, error: "Too many attempts. Please request a new code." };
     if (sha256(opts.code.trim()) !== data.code_hash) {
       await admin.from("admin_otp").update({ attempts: (data.attempts || 0) + 1 }).eq("id", data.id);
       return { ok: false, error: "Incorrect code." };
     }
-    // Consume the code.
-    await admin.from("admin_otp").update({ attempts: OTP_MAX_ATTEMPTS + 1 }).eq("id", data.id);
-    return { ok: true };
+    // Consume the code so it cannot be reused.
+    await admin.from("admin_otp").update({ consumed: true }).eq("id", data.id);
+    return { ok: true, userId: data.user_id };
   } catch {
     return { ok: false, error: "Verification failed." };
   }
 }
+
+export async function clearOtpChallenge(): Promise<void> {
+  try {
+    const { cookies } = await import("next/headers");
+    const store = await cookies();
+    store.delete(OTP_CHALLENGE_COOKIE);
+  } catch {
+    // ignore
+  }
+}
+
+export const OTP_CHALLENGE_COOKIE_NAME = OTP_CHALLENGE_COOKIE;
 
 /* ── Security events ─────────────────────────────────────── */
 

@@ -530,9 +530,12 @@ create table if not exists public.admin_otp (
   user_id uuid not null,
   code_hash text not null,
   purpose text not null default 'login',
+  challenge_id text,
+  consumed boolean default false,
   expires_at timestamptz not null,
   attempts integer default 0,
   created_at timestamptz default now()
 );
 alter table public.admin_otp enable row level security;
 create index if not exists admin_otp_user_idx on public.admin_otp (user_id, created_at desc);
+create index if not exists admin_otp_challenge_idx on public.admin_otp (challenge_id);
