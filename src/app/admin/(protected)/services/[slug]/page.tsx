@@ -8,7 +8,7 @@ export default async function ServiceEditPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  await requireAdmin("content");
+  await requireAdmin("services");
   const { slug } = await params;
   const isNew = slug === "new";
 

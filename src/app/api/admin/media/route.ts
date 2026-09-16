@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const denied = await requireApiPermission("content");
+  const denied = await requireApiPermission("media", "create");
   if (denied) return denied;
   if (!isSupabaseConfigured()) return unauthorized();
 
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const denied = await requireApiPermission("content");
+  const denied = await requireApiPermission("media", "delete");
   if (denied) return denied;
   if (!isSupabaseConfigured()) return unauthorized();
 

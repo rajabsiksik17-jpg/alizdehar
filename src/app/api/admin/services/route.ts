@@ -3,7 +3,7 @@ import { requireApiPermission } from "@/lib/admin-auth";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
-  const denied = await requireApiPermission("content");
+  const denied = await requireApiPermission("services", "create");
   if (denied) return denied;
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -7,7 +7,7 @@ export default async function BlogEditPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  await requireAdmin("content");
+  await requireAdmin("blog");
   const { slug } = await params;
   const isNew = slug === "new";
 

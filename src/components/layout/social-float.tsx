@@ -45,7 +45,7 @@ export function SocialFloat({
         aria-label={open ? (locale === "ar" ? "إغلاق" : "Close") : locale === "ar" ? "تواصل معنا" : "Get in touch"}
         className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-brand-950 shadow-lift transition-all hover:bg-accent-400"
       >
-        <Icon name={open ? "x" : "handshake"} className="h-6 w-6" />
+        <Icon name={open ? "x" : "phone"} className="h-6 w-6" />
       </button>
     </div>
   );

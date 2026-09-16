@@ -95,14 +95,14 @@ export async function POST(request: Request) {
     }
   }
 
-  const dims = payload.dimensions as { area?: string; length?: string; width?: string; height?: string; unit?: string } | null;
+  const dims = payload.dimensions as { volume?: string; length?: string; width?: string; height?: string; unit?: string } | null;
   const meta: { label: string; value: string }[] = [];
   const rtl = locale === "ar";
   const L = (en: string, ar: string) => (rtl ? ar : en);
   if (payload.cargo_type) meta.push({ label: L("Cargo type", "نوع البضاعة"), value: String(payload.cargo_type) });
   if (payload.shipment_size) meta.push({ label: L("Shipment size", "حجم الشحنة"), value: String(payload.shipment_size) });
   if (payload.pickup_location) meta.push({ label: L("Pick up location", "موقع الاستلام"), value: String(payload.pickup_location) });
-  if (dims?.area) meta.push({ label: L("Area", "المساحة"), value: `${dims.area} ${dims.unit || "m²"}` });
+  if (dims?.volume) meta.push({ label: L("Volume", "الحجم"), value: `${dims.volume} ${dims.unit || "m³"}` });
   if (payload.weight) meta.push({ label: L("Weight", "الوزن"), value: `${payload.weight} ${payload.weight_unit || "kg"}` });
 
   await Promise.allSettled([

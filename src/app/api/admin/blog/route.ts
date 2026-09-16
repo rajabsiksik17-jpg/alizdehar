@@ -21,7 +21,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const denied = await requireApiPermission("content");
+  const denied = await requireApiPermission("blog", "create");
   if (denied) return denied;
   if (!isSupabaseConfigured()) return unauthorized();
   let body: Record<string, unknown>;

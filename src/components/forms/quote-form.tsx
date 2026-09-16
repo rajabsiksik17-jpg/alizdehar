@@ -120,7 +120,6 @@ export function QuoteForm({
   const [length, setLength] = useState("");
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
-  const [dimUnit, setDimUnit] = useState("m²");
   const [packages, setPackages] = useState("1");
   const [weight, setWeight] = useState("");
   const [weightUnit, setWeightUnit] = useState("kg");
@@ -130,13 +129,14 @@ export function QuoteForm({
 
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
 
-  // Shipment area (m²) derived from length × width when both are numeric.
-  const area = useMemo(() => {
+  // Shipment volume (m³) derived from length × width × height when all are numeric.
+  const volume = useMemo(() => {
     const l = parseFloat(length);
     const w = parseFloat(width);
-    if (!Number.isFinite(l) || !Number.isFinite(w)) return "";
-    return (l * w).toFixed(2);
-  }, [length, width]);
+    const h = parseFloat(height);
+    if (!Number.isFinite(l) || !Number.isFinite(w) || !Number.isFinite(h)) return "";
+    return (l * w * h).toFixed(2);
+  }, [length, width, height]);
 
   const serviceOptions = services.map((s) => ({ value: s.slug, label: s.name }));
   const cargoOptions = cargoTypes.map((c) => ({ value: c, label: c }));
@@ -192,7 +192,7 @@ export function QuoteForm({
       destination,
       weight,
       weight_unit: weightUnit,
-      dimensions: { length, width, height, unit: dimUnit, packages, area },
+      dimensions: { length, width, height, unit: "m³", packages, volume },
       shipping_date: shippingDate,
       message,
       locale,
@@ -372,17 +372,14 @@ export function QuoteForm({
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-ink-muted">{L(locale, "Unit", "الوحدة")}</label>
-                <select value={dimUnit} onChange={(e) => setDimUnit(e.target.value)} className={input}>
-                  <option value="m²">m²</option>
-                  <option value="cm²">cm²</option>
-                  <option value="ft²">ft²</option>
-                  <option value="in²">in²</option>
-                </select>
+                <div className="flex h-[46px] items-center rounded-xl border border-brand-200 bg-surface-muted px-4 text-sm font-semibold text-brand-800">
+                  {L(locale, "Cubic Meter (m³)", "متر مكعب (م³)")}
+                </div>
               </div>
             </div>
-            {area ? (
+            {volume ? (
               <p className="mt-3 rounded-lg bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-700">
-                {L(locale, `Approx. area:`, `المساحة التقريبية:`)} {area} {dimUnit}
+                {L(locale, `Approx. volume:`, `الحجم التقريبي:`)} {volume} {L(locale, "m³", "م³")}
               </p>
             ) : null}
             <div className="mt-3">
@@ -502,7 +499,7 @@ export function QuoteForm({
           {shippingAddress ? <ReviewRow label={L(locale, "Shipping Address", "عنوان الشحن")} value={shippingAddress} /> : null}
           {origin ? <ReviewRow label={dict.quote.origin} value={origin} /> : null}
           {destination ? <ReviewRow label={dict.quote.destination} value={destination} /> : null}
-          {area ? <ReviewRow label={L(locale, "Shipment Area", "مساحة الشحنة")} value={`${area} ${dimUnit}`} dir="ltr" /> : null}
+          {volume ? <ReviewRow label={L(locale, "Shipment Volume", "حجم الشحنة")} value={`${volume} m³`} dir="ltr" /> : null}
           {weight ? <ReviewRow label={dict.quote.weight} value={`${weight} ${weightUnit}`} dir="ltr" /> : null}
           {shippingDate ? <ReviewRow label={dict.quote.date} value={shippingDate} /> : null}
           {cargoDescription ? <ReviewRow label={L(locale, "Cargo Description", "وصف البضاعة")} value={cargoDescription} /> : null}

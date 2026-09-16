@@ -10,7 +10,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const denied = await requireApiPermission("content");
+  const denied = await requireApiPermission("pages", "edit");
   if (denied) return denied;
   if (!isSupabaseConfigured()) return unauthorized();
   const { id } = await params;
@@ -41,7 +41,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const denied = await requireApiPermission("content");
+  const denied = await requireApiPermission("pages", "delete");
   if (denied) return denied;
   if (!isSupabaseConfigured()) return unauthorized();
   const { id } = await params;

@@ -23,6 +23,7 @@ export function Header({
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(true);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const dict = getDictionary(locale);
 
   useEffect(() => {
@@ -68,20 +69,34 @@ export function Header({
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
             {menu.map((item) =>
               item.children.length ? (
-                <div key={item.id} className="group relative">
+                <div
+                  key={item.id}
+                  className="relative"
+                  onMouseEnter={() => setOpenMenuId(item.id)}
+                  onMouseLeave={() => setOpenMenuId((cur) => (cur === item.id ? null : cur))}
+                >
                   <Link
                     href={href(locale, item.url || "/")}
                     className={cn("flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors", linkColor)}
                   >
                     {pick(item.label, locale)}
-                    <Icon name="chevron-down" className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
+                    <Icon
+                      name="chevron-down"
+                      className={cn("h-3.5 w-3.5 transition-transform", openMenuId === item.id && "rotate-180")}
+                    />
                   </Link>
-                  <div className="invisible absolute start-0 top-full pt-2 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                  <div
+                    className={cn(
+                      "absolute start-0 top-full pt-2 transition-all duration-200",
+                      openMenuId === item.id ? "visible opacity-100" : "invisible opacity-0",
+                    )}
+                  >
                     <ul className="w-72 overflow-hidden rounded-xl border border-brand-100 bg-white p-2 shadow-lift">
                       {item.children.map((child) => (
                         <li key={child.id}>
                           <Link
                             href={href(locale, child.url || "/")}
+                            onClick={() => setOpenMenuId(null)}
                             className="flex items-center justify-between whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium text-brand-800 transition-colors hover:bg-brand-50"
                           >
                             {pick(child.label, locale)}
@@ -119,7 +134,10 @@ export function Header({
             </a>
             <button
               type="button"
-              onClick={() => setMobileOpen((v) => !v)}
+              onClick={() => {
+                setServicesOpen(false);
+                setMobileOpen((v) => !v);
+              }}
               aria-label={mobileOpen ? dict.header.closeMenu : dict.header.openMenu}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
@@ -191,7 +209,10 @@ export function Header({
                             <li key={child.id}>
                               <Link
                                 href={href(locale, child.url || "/")}
-                                onClick={() => setMobileOpen(false)}
+                                onClick={() => {
+                                  setServicesOpen(false);
+                                  setMobileOpen(false);
+                                }}
                                 className="flex items-center justify-between rounded-lg px-3 py-3 text-base font-semibold text-brand-800 hover:bg-brand-50"
                               >
                                 {pick(child.label, locale)}

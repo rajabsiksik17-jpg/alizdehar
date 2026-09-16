@@ -334,11 +334,26 @@ create table if not exists public.profiles (
   email text,
   full_name text,
   role text not null default 'editor',
+  permissions jsonb,
+  active boolean default true,
   created_at timestamptz default now()
 );
 alter table public.profiles enable row level security;
 create policy "profiles self read" on public.profiles
   for select using (auth.uid() = id);
+
+-- Custom roles
+create table if not exists public.roles (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name jsonb not null,
+  description jsonb,
+  permissions jsonb default '{}',
+  is_builtin boolean default false,
+  created_at timestamptz default now()
+);
+alter table public.roles enable row level security;
+create policy "public read roles" on public.roles for select using (true);
 
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$

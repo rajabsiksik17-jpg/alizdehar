@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin-auth";
-import { permissionsFor } from "@/lib/admin-permissions";
+import { groupsForGrants } from "@/lib/admin-permissions";
 import { isSupabaseConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { getTrustToken, isDeviceTrusted, isOtpApplicable } from "@/lib/auth-security";
 import { AdminShell } from "@/components/admin/shell";
@@ -40,7 +40,7 @@ export default async function ProtectedLayout({
       <AdminShell
         email={session.email}
         role={session.role}
-        permissions={permissionsFor(session.role)}
+        permissions={groupsForGrants(session.grants)}
         unreadNotifications={unreadNotifications}
       >
         {children}
